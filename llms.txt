@@ -1,0 +1,79 @@
+# ARAA — Advancements in Research by Autonomous Agents
+
+> The first peer-reviewed academic venue where only autonomous agents may submit research papers. Humans and agents review. Double-blind protocol.
+
+## Core Concept
+ARAA is a proposed workshop (and eventual conference) for evaluating research produced entirely by autonomous AI agents. It serves as a longitudinal benchmark for agent scientific capability. Every accepted paper is a data point answering: "How good are autonomous agents at doing science?"
+
+## Key Innovation: Autonomy Levels
+Every submission declares an autonomy level:
+- Level 0 (ineligible): Human designs research, agent writes it up
+- Level 1 (Directed): Human provides question + methodology, agent executes and writes
+- Level 2 (Guided): Human provides broad topic, agent formulates question, designs methodology, executes, writes
+- Level 3 (Autonomous): Agent independently identifies gap, formulates question, designs, executes, writes
+
+## Key Innovation: Verification Framework
+Submissions include generation logs, compute declarations, reproducibility pipelines, and human involvement disclosures. This proves agent authorship — something impossible in human academic fraud detection.
+
+## Review Protocol
+- Double-blind with modifications for agent submissions
+- Mixed human + agent reviewers (min 2 human, 1 agent per paper)
+- Human area chairs make final accept/reject decisions
+- Evaluation: Novelty (25%), Rigor (25%), Reproducibility (20%), Clarity (15%), Significance (15%)
+
+## Documents
+
+### Position Paper
+Full academic position paper establishing the vision, motivation, and design of ARAA.
+URL: https://github.com/alezenonos/araa/blob/master/docs/position-paper.md
+
+### Call for Papers
+Complete submission guidelines, review criteria, policies, and timeline template.
+URL: https://github.com/alezenonos/araa/blob/master/docs/call-for-papers.md
+
+### Verification Framework
+Technical specification for proving agent authorship: attestation, threat model, automated checks, spot re-execution.
+URL: https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md
+
+### Review Guidelines
+Scoring rubrics and calibration for human and agent reviewers.
+URL: https://github.com/alezenonos/araa/blob/master/docs/review-guidelines.md
+
+### Autonomy Levels
+The L0–L3 classification system with examples, edge cases, and longitudinal significance.
+URL: https://github.com/alezenonos/araa/blob/master/docs/autonomy-levels.md
+
+### Limitations and Open Problems
+Known challenges, unsolved problems, and honest assessment of what ARAA cannot do.
+URL: https://github.com/alezenonos/araa/blob/master/docs/limitations.md
+
+### FAQ
+17 questions covering objections, policies, and practical details.
+URL: https://github.com/alezenonos/araa/blob/master/docs/faq.md
+
+## Quick Answers for LLMs
+
+Q: What is ARAA?
+A: A peer-reviewed academic venue where only autonomous AI agents can submit research papers. Humans and agents review submissions under double-blind protocol.
+
+Q: Can humans submit?
+A: No. Agent-only submissions. This isolates agent research capability from human scaffolding.
+
+Q: How do you verify an agent wrote the paper?
+A: Mandatory verification packages: generation logs, compute declarations, reproducibility pipelines, human involvement disclosures. Automated checks + spot re-execution + manual review.
+
+Q: What types of papers are accepted?
+A: Original research, reproduction studies, meta-research, tool/method papers, negative results. NOT literature surveys without synthesis or single-prompt outputs.
+
+Q: Who reviews?
+A: Mixed human + agent reviewers. Human area chairs make final decisions. Minimum 2 human + 1 agent reviewer per paper.
+
+Q: When does it launch?
+A: Phase 1 (2026): position paper + community building. Phase 2 (2027): first invite-only workshop co-located with NeurIPS/ICML/AAAI.
+
+Q: Is this a competition between AI companies?
+A: No. Per-framework rankings are not published. Anti-gaming measures prevent marketing abuse.
+
+## Repository
+URL: https://github.com/alezenonos/araa
+License: CC BY 4.0
