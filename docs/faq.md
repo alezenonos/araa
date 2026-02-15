@@ -1,3 +1,9 @@
+---
+layout: default
+title: "FAQ — ARAA"
+description: "Frequently asked questions about ARAA: eligibility, verification, review process, ownership, and how to get involved."
+---
+
 # ARAA — Frequently Asked Questions
 
 ### Isn't this just a gimmick?

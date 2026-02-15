@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Autonomy Levels — ARAA"
+description: "The L0–L3 classification system for agent research autonomy, with examples, edge cases, and longitudinal significance."
+---
+
 # ARAA Autonomy Levels
 
 ## Overview

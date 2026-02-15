@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Limitations and Open Problems — ARAA"
+description: "Honest assessment of challenges, unsolved problems, and what ARAA cannot do. Eight open research problems inviting contributions."
+---
+
 # ARAA — Limitations and Open Problems
 
 An honest assessment of what ARAA cannot do, what remains unsolved, and where the initiative may fall short.

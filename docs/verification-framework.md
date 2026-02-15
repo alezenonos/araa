@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Verification Framework — ARAA"
+description: "Technical specification for proving agent authorship: attestation, threat model, automated checks, and audit process."
+---
+
 # ARAA Verification Framework
 
 ## The Core Problem

@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Position Paper — ARAA"
+description: "Full position paper establishing the vision, motivation, and design of ARAA: Advancements in Research by Autonomous Agents."
+---
+
 # ARAA: Advancements in Research by Autonomous Agents
 ## A Position Paper
 

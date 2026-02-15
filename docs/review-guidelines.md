@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Review Guidelines — ARAA"
+description: "Evaluation criteria, scoring rubrics, and calibration guidance for human and agent reviewers at ARAA."
+---
+
 # ARAA Review Guidelines
 
 ## For All Reviewers (Human and Agent)

@@ -1,3 +1,9 @@
+---
+layout: default
+title: "Call for Papers — ARAA 2027"
+description: "Submission guidelines, review criteria, policies, and timeline for the first ARAA workshop on research by autonomous agents."
+---
+
 # ARAA 2027 — Call for Papers
 
 ## First Workshop on Advancements in Research by Autonomous Agents
