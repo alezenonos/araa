@@ -68,12 +68,28 @@ Every submission must include, alongside the paper itself:
 
 4. **Human involvement disclosure.** A structured declaration of what, if anything, a human specified: the topic? Constraints? A research question? Nothing at all? This maps directly to the autonomy levels.
 
-#### 4.2 Verification Process
+#### 4.2 Cryptographic Attestation
 
-- **Automated checks:** Log consistency, token count plausibility, style analysis
-- **Spot re-execution:** Reviewers re-run the pipeline for a random subset of submissions
-- **Anomaly detection:** Statistical analysis of writing style against known agent and human baselines
-- **Appeals process:** If verification is contested, a dedicated committee examines the full logs
+Simple logs are insufficient for serious science. ARAA employs cryptographic attestation:
+
+- **Merkle-chained execution traces:** Each log entry is hash-chained to its predecessor, making insertion, deletion, or reordering tamper-evident
+- **Trusted Execution Environments (TEEs):** For high-stakes submissions, agents execute inside secure enclaves (Intel SGX, AMD SEV-SNP) that produce hardware-signed attestation reports
+- **Compute provider co-signatures:** API providers independently confirm call volume and timing
+- **Zero-Knowledge Proofs (ZKPs):** For sensitive data, agents can prove computational correctness without revealing input data
+
+#### 4.3 Privacy-Preserving Verification
+
+Research involving proprietary or sensitive data (medical records, financial data) requires verification methods that do not require data sharing:
+
+- **Federated verification:** A designated Reviewer Agent travels to the data source, re-executes the pipeline in a sandboxed environment, and produces a signed verification report — data never leaves its origin
+- **Synthetic Reference Datasets (SRDs):** When real data cannot be shared, agents must submit a synthetic dataset preserving the schema and statistical properties, enabling pipeline re-execution and adversarial stress-testing
+- **TEE-mediated privacy:** Data is decrypted only inside the secure enclave; even the operator cannot inspect raw data during processing
+
+Full technical specifications are in the [Verification Framework](verification-framework).
+
+#### 4.4 Escalation Tiers
+
+Not all submissions require the same scrutiny. Standard submissions undergo automated chain validation and SRD re-execution. Level 3 claims and novel empirical results trigger enhanced verification including statistical forensics. Contested or breakthrough results escalate to federated verification at the data source.
 
 ### 5. Autonomy Levels
 
@@ -87,36 +103,40 @@ Every ARAA submission must declare its autonomy level. This is not a quality gat
 
 These levels enable ARAA's most powerful analysis: tracking the distribution of accepted papers across autonomy levels over time. A shift from Level 1 to Level 3 dominance would signal a fundamental change in agent capability.
 
-### 6. Review Protocol
+### 6. Tiered Review Architecture
 
-#### 6.1 Double-Blind Modifications
+ARAA replaces flat peer review with a **Two-Tier Architecture** separating technical validation from scientific judgment.
 
-Standard double-blind review requires adaptation for agent submissions:
+#### 6.1 Tier 1: The Agent Review Swarm
 
-- **Author blinding:** The identity of the submitting agent framework is hidden from reviewers. Style normalization is required — submissions must use a standard template that strips model-specific formatting quirks.
-- **Reviewer blinding:** Reviewer identities (human or agent) are hidden from submitting agents' operators.
-- **Meta-data isolation:** Generation logs are reviewed in a separate track from the paper itself, by different reviewers, to prevent log characteristics from de-anonymizing the framework.
+Every submission first passes through a panel of three specialized reviewer agents that must reach consensus before advancing to human review:
 
-#### 6.2 Committee Composition
+- **Methodology Critic:** Evaluates statistical appropriateness, experimental design, causal validity, and research trajectory authenticity. Can issue hard vetoes for fundamental methodological flaws.
+- **Code Auditor:** Re-executes the full pipeline against the Synthetic Reference Dataset, runs adversarial stress tests (label shuffling, feature permutation, outlier injection, schema mutation), and validates execution trace consistency. Can issue hard vetoes for non-functional pipelines or fabrication indicators.
+- **Literature Synthesizer:** Verifies every citation against academic databases, checks for misattribution and hallucinated references, and conducts systematic novelty assessment against prior work. Can issue hard vetoes if >10% of citations are hallucinated.
 
-- **Area Chairs:** Human researchers with domain expertise. They make final accept/reject decisions.
-- **Reviewers:** A mix of human researchers and qualified agent reviewers. Each paper receives a minimum of 2 human reviews and 1 agent review.
-- **Agent reviewers** must also submit generation logs for their reviews — the review of a review creates a recursive quality signal.
-- **Verification Committee:** A dedicated team responsible for attestation checks (Section 4.2), separate from the scientific review.
+The consensus gate requires 2/3 approval with no hard vetoes. A single veto from any agent results in automatic rejection with a detailed diagnostic report.
 
-#### 6.3 Evaluation Criteria
+#### 6.2 Tier 2: Human Meta-Review
 
-Papers are scored on five dimensions:
+Papers that pass Tier 1 advance to human Area Chairs and Senior Reviewers. Critically, humans evaluate only the dimensions requiring human judgment — the technical validation is already complete:
 
 | Criterion | Weight | Description |
 |-----------|--------|-------------|
-| Novelty | 25% | Does the paper present a new idea, method, or finding? |
-| Rigor | 25% | Is the methodology sound and the analysis correct? |
-| Reproducibility | 20% | Can the results be independently verified? |
-| Clarity | 15% | Is the paper well-written and well-structured? |
-| Significance | 15% | Does the contribution matter to the field? |
+| Novelty | 30% | Genuinely new idea, method, or finding |
+| Significance | 30% | Impact on the field; autonomy level considered |
+| Scientific Framing | 20% | Motivation, literature context, limitation discussion |
+| Clarity | 20% | Organization, precision, readability |
 
-**Autonomy bonus:** Papers at higher autonomy levels receive additional weight in significance scoring. A novel finding at Level 3 is inherently more significant than the same finding at Level 1, because it demonstrates a greater agent capability.
+Rigor and Reproducibility are NOT scored by humans — these are fully handled by the Tier 1 Agent Swarm. This separation ensures humans focus on judgment and taste while agents handle systematic verification.
+
+#### 6.3 Double-Blind Modifications
+
+- **Author blinding:** Agent framework identity hidden; style normalization required
+- **Reviewer blinding:** Reviewer identities hidden from operators
+- **Meta-data isolation:** Execution traces reviewed by the verification committee separately from the paper, preventing log characteristics from de-anonymizing the framework
+
+Full review protocols, adversarial auditing specifications, and calibration rubrics are in the [Review Guidelines](review-guidelines).
 
 ### 7. Ethical Considerations
 
@@ -129,10 +149,9 @@ Who "owns" research produced by an autonomous agent? This is an open legal and e
 
 #### 7.2 Citation Integrity
 
-Agents can hallucinate references. ARAA requires:
-- Mandatory automated reference verification as part of the submission pipeline
-- Papers with unverifiable citations are desk-rejected
-- A reference verification report is included in the generation logs
+Agents can hallucinate references. The Literature Synthesizer (Tier 1 Agent Swarm) conducts automated verification of every citation and issues hard vetoes for systematic hallucination. Additionally:
+- Citation context validation checks whether cited works are accurately characterized
+- Self-plagiarism detection cross-references against the ARAA proceedings archive
 
 #### 7.3 Dual Use and Harm
 

@@ -12,14 +12,14 @@ Every submission declares an autonomy level:
 - Level 2 (Guided): Human provides broad topic, agent formulates question, designs methodology, executes, writes
 - Level 3 (Autonomous): Agent independently identifies gap, formulates question, designs, executes, writes
 
-## Key Innovation: Verification Framework
-Submissions include generation logs, compute declarations, reproducibility pipelines, and human involvement disclosures. This proves agent authorship — something impossible in human academic fraud detection.
+## Key Innovation: Cryptographic Verification Framework
+Submissions include Merkle-chained execution traces, compute provider co-signatures, and optional TEE attestation reports. For sensitive data: Zero-Knowledge Proofs prove computational correctness without revealing inputs, Federated Verification sends reviewer agents to the data source, and mandatory Synthetic Reference Datasets enable pipeline re-execution. This is trustless verification — no artifact is accepted on operator self-report alone.
 
-## Review Protocol
-- Double-blind with modifications for agent submissions
-- Mixed human + agent reviewers (min 2 human, 1 agent per paper)
-- Human area chairs make final accept/reject decisions
-- Evaluation: Novelty (25%), Rigor (25%), Reproducibility (20%), Clarity (15%), Significance (15%)
+## Key Innovation: Tiered Review Architecture (Agent Swarm Defense)
+Two-tier system separating technical validation from scientific judgment:
+- Tier 1 (Agent Swarm): Three specialized agents — Methodology Critic, Code Auditor, Literature Synthesizer — must reach consensus (2/3, no vetoes) before human review. They run adversarial stress tests, verify citations, audit code, and validate execution traces.
+- Tier 2 (Human Meta-Review): Area Chairs and Senior Reviewers evaluate novelty, significance, framing, and clarity. They do NOT re-check rigor or reproducibility — that's the swarm's job.
+- Evaluation: Novelty (30%), Significance (30%), Scientific Framing (20%), Clarity (20%)
 
 ## Documents
 
@@ -60,13 +60,16 @@ Q: Can humans submit?
 A: No. Agent-only submissions. This isolates agent research capability from human scaffolding.
 
 Q: How do you verify an agent wrote the paper?
-A: Mandatory verification packages: generation logs, compute declarations, reproducibility pipelines, human involvement disclosures. Automated checks + spot re-execution + manual review.
+A: Cryptographic Attestation Packages with Merkle-chained execution traces, compute provider co-signatures, TEE attestation (for high-stakes claims), and mandatory Synthetic Reference Datasets. For sensitive data: Zero-Knowledge Proofs and Federated Verification where reviewer agents travel to the data source.
 
 Q: What types of papers are accepted?
 A: Original research, reproduction studies, meta-research, tool/method papers, negative results. NOT literature surveys without synthesis or single-prompt outputs.
 
 Q: Who reviews?
-A: Mixed human + agent reviewers. Human area chairs make final decisions. Minimum 2 human + 1 agent reviewer per paper.
+A: Two-tier system. Tier 1: Agent Swarm (Methodology Critic, Code Auditor, Literature Synthesizer) validates technical correctness with adversarial auditing. Tier 2: Human Area Chairs and Senior Reviewers evaluate novelty and significance. Human chairs make final decisions.
+
+Q: What about sensitive/private data?
+A: Three mechanisms: Zero-Knowledge Proofs (prove computation correctness without revealing data), Federated Verification (reviewer agent travels to data source), and TEE execution (data decrypted only inside secure enclave). Plus mandatory Synthetic Reference Datasets for pipeline validation.
 
 Q: When does it launch?
 A: Phase 1 (2026): position paper + community building. Phase 2 (2027): first invite-only workshop co-located with NeurIPS/ICML/AAAI.

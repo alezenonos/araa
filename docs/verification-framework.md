@@ -1,171 +1,361 @@
 ---
 layout: default
 title: "Verification Framework — ARAA"
-description: "Technical specification for proving agent authorship: attestation, threat model, automated checks, and audit process."
+description: "Cryptographic attestation, privacy-preserving reproducibility, and adversarial auditing protocols for autonomous agent research."
 ---
 
 # ARAA Verification Framework
+## Cryptographic Attestation & Privacy-Preserving Reproducibility
 
-## The Core Problem
+### Preamble
 
-How do you prove an autonomous agent — and not a human — produced a research paper?
+The replication crisis in human science stems, in part, from the absence of verifiable execution traces. Autonomous agent research presents a unique opportunity: the entire research pipeline — from hypothesis generation to manuscript composition — can be cryptographically attested, adversarially audited, and independently re-executed. This is not merely a feature of agentic science; it is a prerequisite for its legitimacy.
 
-Human academic fraud (ghostwriting, fabrication) is notoriously difficult to detect because humans don't leave audit trails. Agents do. ARAA leverages this asymmetry: **the cost of proving authenticity is low for genuine agent submissions and high for fraudulent ones.**
+ARAA's verification framework is designed around three principles:
+
+1. **Trustless verification** — no artifact is accepted on the basis of operator self-report alone
+2. **Privacy-preserving reproducibility** — sensitive data need never leave its origin; verification travels to the data, not the reverse
+3. **Adversarial robustness** — the framework assumes bad actors and designs for them
+
+This document specifies the technical architecture for achieving these principles at scale.
 
 ---
 
-## 1. Required Artifacts
+## 1. Cryptographic Attestation of Compute
 
-Every ARAA submission includes a **Verification Package** alongside the paper:
+### 1.1 The Attestation Package
 
-### 1.1 Generation Logs
+Every ARAA submission includes a **Cryptographic Attestation Package (CAP)** alongside the manuscript. The CAP replaces the notion of simple "generation logs" with a tamper-evident, cryptographically signed execution record.
 
-The complete, timestamped record of the agent's research process:
+**Required components:**
+
+| Artifact | Description | Integrity Mechanism |
+|----------|-------------|-------------------|
+| Execution trace | Complete prompt chain, tool calls, intermediate outputs, decision points | Merkle tree over sequential log entries; root hash signed by execution environment |
+| Compute manifest | Model family (anonymized), token counts, API calls, wall-clock time, cost | Signed by the compute provider or TEE attestation report |
+| Environment snapshot | Reproducibility container image hash, dependency versions, random seeds | Content-addressed (SHA-256) container registry reference |
+| Human involvement disclosure | Structured declaration of all human inputs per the Autonomy Level schema | Signed by the operator; cross-referenced against execution trace timestamps |
+
+### 1.2 Execution Trace Integrity
+
+The execution trace is not a flat log file. It is a **Merkle-chained sequence** of events:
 
 ```
-[2027-03-15T10:23:01Z] PROMPT: "Identify underexplored areas in federated learning for healthcare"
-[2027-03-15T10:23:04Z] RESPONSE: "Three areas appear underexplored: (1) ..."
-[2027-03-15T10:23:15Z] TOOL_CALL: scholar_search("federated learning patient heterogeneity")
-[2027-03-15T10:23:17Z] TOOL_RESULT: [12 papers returned]
-[2027-03-15T10:23:30Z] RESPONSE: "Based on the literature, I'll focus on ..."
-...
+Entry_n = {
+  sequence_id: n,
+  timestamp: ISO-8601 (monotonic),
+  event_type: PROMPT | RESPONSE | TOOL_CALL | TOOL_RESULT | DECISION | ERROR,
+  content_hash: SHA-256(content),
+  prev_hash: SHA-256(Entry_{n-1}),
+  cumulative_root: MerkleRoot(Entry_0 ... Entry_n)
+}
 ```
 
-**Requirements:**
-- Every prompt, response, tool call, and intermediate output
-- Timestamps (monotonic, consistent)
-- No gaps > 5 minutes without explanation (e.g., rate limiting, compute wait)
-- Includes dead ends, failed approaches, and revisions (not just the clean path)
+This structure provides:
+- **Tamper evidence** — inserting, deleting, or reordering entries invalidates the chain
+- **Selective disclosure** — operators can reveal specific entries for review without exposing the full trace, while proving their position in the chain
+- **Efficient auditing** — verification agents can validate chain integrity in O(n) and query specific subtrees in O(log n)
 
-### 1.2 Compute Declaration
+Dead ends, failed approaches, and revisions are cryptographically committed. The trace records the *actual* research process, not a sanitized narrative.
 
-| Field | Example |
-|-------|---------|
-| Model family | Large language model (specific identity anonymized for review) |
-| Total API calls | 847 |
-| Total tokens (input) | 1,240,000 |
-| Total tokens (output) | 380,000 |
-| Tool calls | 156 (web search: 43, code execution: 89, file operations: 24) |
-| Wall-clock time | 14 hours 23 minutes |
-| Estimated compute cost | $47.30 |
-| Human interventions | 0 (Level 3) / 3 (Level 2) / describe each |
+### 1.3 Trusted Execution Environments (TEEs)
 
-### 1.3 Reproducibility Pipeline
+For high-stakes submissions — particularly those involving sensitive data or claiming breakthrough results — ARAA supports execution within **Trusted Execution Environments** (Intel SGX, AMD SEV-SNP, ARM CCA, or cloud-based Confidential Computing instances):
 
-A frozen configuration that allows the verification committee to re-execute the research pipeline:
+- The agent's research pipeline executes inside a secure enclave
+- The TEE produces a hardware-signed **attestation report** binding the execution trace to a specific code image, platform configuration, and time window
+- This attestation is unforgeable without compromising the hardware root of trust
+- The CAP includes the TEE attestation report alongside the Merkle-chained trace
+
+**TEE execution is optional for Phase 1–2 but becomes mandatory for Level 3 (Autonomous) submissions claiming novel empirical results by Phase 3.**
+
+The rationale: as ARAA matures and stakes increase, the cost of fabrication must scale proportionally. TEE attestation raises the bar from "difficult to fake logs" to "requires compromising hardware security."
+
+### 1.4 Compute Provider Co-Signatures
+
+Where TEE execution is not feasible, ARAA accepts **compute provider co-signatures**: the API provider (e.g., the foundation model host) independently signs a statement confirming that a specific sequence of API calls occurred within a given time window, matching the declared token counts.
+
+This does not prove the *content* of the calls but proves the *volume and timing* — sufficient to detect gross fabrication.
+
+---
+
+## 2. Privacy-Preserving Verification
+
+### 2.1 The Problem
+
+The original ARAA draft assumed data can always be shared for reproducibility. This is naive. Serious agentic research will inevitably involve:
+
+- **Protected health information (PHI)** under HIPAA, GDPR, or equivalent
+- **Proprietary datasets** under NDA or trade-secret protection
+- **Sensitive government or institutional data** with access restrictions
+- **Personally identifiable information (PII)** requiring anonymization
+
+A verification framework that cannot handle these cases excludes precisely the domains where agentic research is most promising (clinical science, financial modeling, population-level analytics). ARAA addresses this through three complementary mechanisms.
+
+### 2.2 Zero-Knowledge Proofs (ZKPs) for Computational Integrity
+
+For computations over sensitive data, the submitting agent can provide a **zero-knowledge proof** that a specific computation was correctly executed on a specific (hidden) input, producing a specific output — without revealing the input data.
+
+**Application to ARAA:**
+
+```
+Statement: "The logistic regression trained on dataset D achieved AUC = 0.847 
+            on holdout set H, where D has schema S and |D| = 12,450 records."
+
+ZKP proves: The computation f(D) → 0.847 was correctly executed,
+            D conforms to schema S, |D| = 12,450.
+
+Revealed:   Schema S, |D|, AUC score, computation f.
+Hidden:     The actual records in D.
+```
+
+Current ZKP systems (zkSNARKs, zkSTARKs, Plonk) impose significant computational overhead, limiting applicability to simpler statistical computations in Phase 1. As proof systems mature (particularly for ML inference verification), coverage will expand. ARAA maintains a registry of approved ZKP circuits for common statistical and ML operations.
+
+**Practical constraint:** ZKPs for full neural network training remain computationally prohibitive as of 2026. ARAA's ZKP track initially supports:
+- Descriptive statistics and hypothesis tests
+- Linear and logistic regression
+- Decision tree / random forest inference
+- Standard preprocessing pipelines (normalization, imputation, encoding)
+
+### 2.3 Federated Verification
+
+When neither the data nor a zero-knowledge proof can leave the data source, ARAA supports **federated verification**: a Reviewer Agent travels to the data rather than the data traveling to the reviewer.
+
+**Protocol:**
+
+1. The data custodian provides a **sandboxed execution environment** at the data source (on-premise server, institutional compute cluster, or cloud VPC)
+2. ARAA's designated **Verification Agent** is deployed into this environment with read-only access to the dataset and the submitting agent's reproducibility container
+3. The Verification Agent re-executes the pipeline, compares outputs, and produces a signed verification report
+4. The Verification Agent is then destroyed; no data copy persists outside the custodian's perimeter
+
+**Guarantees:**
+- Data never leaves the custodian's infrastructure
+- The Verification Agent's code is open-source and auditable
+- The custodian can monitor all operations in real-time
+- The verification report contains only aggregate statistics and a pass/fail determination — no raw data
+
+**Trust model:** The data custodian must trust the Verification Agent code (auditable) and the sandboxed environment (their own infrastructure). ARAA must trust that the custodian did not tamper with the data between the original execution and the verification run (mitigated by timestamp-binding in the original CAP).
+
+### 2.4 Trusted Execution Environments for Data Privacy
+
+TEEs (Section 1.3) serve double duty: they attest compute integrity *and* protect data privacy. When research is conducted inside a TEE:
+
+- The data is decrypted only inside the enclave
+- The agent processes the data and produces results
+- The attestation report proves correct execution without exposing the data
+- Even the operator cannot inspect the raw data during processing
+
+This is the strongest privacy guarantee ARAA can offer and is recommended for all submissions involving PHI or PII.
+
+---
+
+## 3. The Synthetic Data Mandate
+
+### 3.1 Rationale
+
+Privacy-preserving proofs establish that a computation *was correct*. They do not allow independent researchers to *explore, extend, or critique* the methodology. For that, you need executable data. ARAA bridges this gap with a mandatory synthetic data requirement.
+
+### 3.2 The Mandate
+
+**If the real data cannot be shared, the submitting agent MUST generate and submit a Synthetic Reference Dataset (SRD) that:**
+
+1. **Preserves the schema** — identical column names, data types, and categorical levels
+2. **Preserves statistical properties** — matching marginal distributions, key correlations, and summary statistics within declared tolerance bounds
+3. **Preserves dimensionality** — same number of features; sample size within 10% of original
+4. **Does NOT preserve individual records** — synthetic generation must use a privacy-safe mechanism (differential privacy, copula-based synthesis, or generative modeling with formal privacy guarantees)
+
+### 3.3 SRD Specification
 
 ```yaml
-# araa-repro.yaml
-framework: anonymized  # revealed post-acceptance
-model_config:
-  temperature: 0.7
-  max_tokens: 4096
-  seed: 42  # if supported
-tools:
-  - web_search: {engine: "scholar", max_results: 20}
-  - code_execution: {runtime: "python3.11", packages: [...]}
-  - file_system: {workspace: "./research/"}
-initial_prompt: "..."
-constraints: "..."
+# araa-srd-spec.yaml
+original_dataset:
+  name: "[REDACTED] Clinical Trial Dataset"
+  records: 12450
+  features: 47
+  schema_hash: SHA-256(schema)  # verifiable against the paper's methodology section
+
+synthetic_dataset:
+  generation_method: "CTGAN with differential privacy (ε=1.0, δ=1e-5)"
+  records: 12450
+  features: 47
+  
+  preservation_report:
+    marginal_ks_test_max_p: 0.73      # worst-case KS test p-value across features
+    correlation_rmse: 0.041            # RMSE between original and synthetic correlation matrices
+    target_distribution_divergence: 0.018  # KL divergence of target variable distribution
+    utility_score: 0.91               # ML model performance ratio (synthetic/original)
+  
+  privacy_report:
+    mechanism: "differential_privacy"
+    epsilon: 1.0
+    delta: 1e-5
+    nearest_neighbor_distance_ratio: 2.3  # min distance to real record / avg pairwise distance
 ```
 
-**Note:** Re-execution need not produce an identical paper. It must produce one with:
-- The same core research question
-- The same general methodology
-- Compatible findings (within expected variance)
+### 3.4 How It's Used
 
-### 1.4 Human Involvement Disclosure
+The SRD enables the **Code Auditor Agent** (Section 4.2) to:
+- Execute the full analysis pipeline end-to-end
+- Verify that code is functional, logically coherent, and produces outputs matching the declared methodology
+- Check that statistical tests are correctly implemented
+- Confirm that reported metrics are computed correctly (on the synthetic data, results will differ in value but not in kind)
 
-A structured form — not free text — to prevent ambiguity:
+The SRD does NOT replace the ZKP or federated verification of actual results. It complements them: ZKPs prove the real results are correct; the SRD proves the methodology is sound.
 
-```yaml
-autonomy_level: 3  # self-declared, verified against logs
-human_inputs:
-  - type: "initiation"
-    description: "Started the agent with topic area 'federated learning'"
-    timestamp: "2027-03-15T10:22:00Z"
-  - type: "none"  # no further human involvement
-# OR for Level 1/2:
-  - type: "methodology_guidance"
-    description: "Suggested using synthetic data for privacy experiments"
-    timestamp: "2027-03-15T14:30:00Z"
-human_reviews_before_submission: 0  # did a human read it before submitting?
-human_edits_before_submission: 0    # did a human edit any text?
+### 3.5 Adversarial Stress-Testing
+
+The Code Auditor Agent additionally runs the pipeline against **adversarial perturbations** of the SRD:
+- Random feature permutation (should break meaningful models)
+- Label shuffling (should degrade performance to chance)
+- Injection of extreme outliers (should be handled by preprocessing)
+
+A pipeline that produces identical results regardless of input perturbation is flagged for investigation — it may indicate hardcoded results or data leakage.
+
+---
+
+## 4. Reproducibility Containers
+
+### 4.1 Container Specification
+
+Every submission includes a **reproducibility container** — a fully self-contained execution environment:
+
+```dockerfile
+# ARAA Reproducibility Container
+FROM araa/base-runtime:2027.1
+
+# Deterministic dependency installation
+COPY requirements.lock /app/requirements.lock
+RUN pip install --no-deps -r /app/requirements.lock
+
+# Research pipeline
+COPY pipeline/ /app/pipeline/
+COPY config/araa-repro.yaml /app/config.yaml
+
+# Synthetic Reference Dataset
+COPY data/synthetic/ /app/data/
+
+# Entry point
+ENTRYPOINT ["python", "/app/pipeline/run.py", "--config", "/app/config.yaml"]
 ```
 
----
+The container image is content-addressed (SHA-256) and stored in ARAA's container registry. This ensures bit-for-bit reproducibility of the execution environment across verification runs.
 
-## 2. Verification Process
+### 4.2 Environment Pinning
 
-### 2.1 Automated Checks (All Submissions)
-
-Run automatically at submission time:
-
-| Check | Method | Failure = |
-|-------|--------|-----------|
-| Log consistency | Timestamp monotonicity, token count plausibility, tool call/response pairing | Desk reject |
-| Reference verification | Automated lookup of every citation (DOI, arXiv, URL) | Desk reject if >10% unverifiable |
-| Style analysis | Statistical comparison against known agent/human writing baselines | Flag for manual review |
-| Cost plausibility | Declared compute vs. paper complexity | Flag if implausible |
-| Autonomy level check | Cross-reference declared level against human involvement disclosure | Flag if inconsistent |
-
-### 2.2 Spot Re-execution (Random Sample)
-
-- 20-30% of submissions are selected for re-execution
-- Verification committee runs the reproducibility pipeline
-- Checks whether the re-executed version produces compatible research
-- Significant divergence triggers full investigation
-
-### 2.3 Manual Review (Flagged Submissions)
-
-For submissions flagged by automated checks or spot re-execution:
-- Deep log analysis by verification committee members
-- Comparison of writing style, reasoning patterns, and error types against known agent signatures
-- Interview with the operator (if needed)
-
-### 2.4 Post-Acceptance Audit
-
-- All accepted papers have their generation logs published
-- Community can flag concerns within 30 days
-- Retractions follow standard academic process
+- All dependencies are version-locked (no floating versions)
+- The base runtime image is maintained by ARAA and updated on a fixed annual cadence
+- Random seeds are declared; where true determinism is impossible (GPU non-determinism, API call variance), acceptable variance bounds are specified
+- Network access during re-execution is disabled — all external resources must be cached in the container
 
 ---
 
-## 3. Threat Model
+## 5. Threat Model
 
-### 3.1 Human Ghostwriting
-**Threat:** A human writes the paper and fabricates agent logs.
-**Mitigation:** Log consistency checks (extremely difficult to fabricate 800+ realistic API calls with plausible timing, token counts, and intermediate reasoning). Spot re-execution would fail.
+### 5.1 Human Ghostwriting
 
-### 3.2 Heavy Human Scaffolding
-**Threat:** A human essentially directs every step but through the agent interface, claiming Level 2/3.
-**Mitigation:** Human involvement disclosure must account for all interactions. Log analysis can detect suspiciously directive prompts. Statistical analysis of prompt patterns.
+**Threat:** A human writes the paper and fabricates agent execution traces.
 
-### 3.3 Agent Fine-Tuning for ARAA
-**Threat:** An agent is specifically fine-tuned to produce ARAA-style papers without genuine research capability.
-**Mitigation:** The verification committee evaluates whether the research process (in logs) reflects genuine scientific reasoning or pattern matching. Reproduction studies test whether findings hold.
+**Defenses (layered):**
+- Merkle-chained execution traces are extraordinarily difficult to fabricate — hundreds of entries with plausible timing, token distributions, dead ends, and error recovery patterns
+- Compute provider co-signatures independently confirm API call volume and timing
+- TEE attestation (when used) makes fabrication equivalent to compromising hardware security
+- The Code Auditor Agent (Tier 1 review) re-executes the pipeline; fabricated traces without a functional pipeline fail immediately
+- Statistical forensics: agent-generated reasoning exhibits distributional signatures (token-level entropy, sentence structure variance, error patterns) that are computationally expensive to mimic
 
-### 3.4 Multi-Agent Laundering
-**Threat:** Using one agent to research and another to write, obscuring the pipeline.
-**Mitigation:** Full pipeline logs are required. Multi-agent setups are permitted but must be fully disclosed. Each agent's contribution must be logged separately.
+### 5.2 Heavy Human Scaffolding
+
+**Threat:** A human directs every decision through carefully crafted prompts, claiming Level 2/3.
+
+**Defenses:**
+- Human involvement disclosure is cross-referenced against execution trace timestamps — every interaction must appear in the Merkle chain
+- Prompt pattern analysis: directive prompts ("now do X, then Y, then Z") exhibit statistical signatures distinct from open-ended initiation ("explore this domain")
+- The Methodology Critic Agent (Tier 1 review) evaluates whether the research trajectory shows genuine exploration vs. following a predetermined script
+- Anomaly detection: Level 3 claims with suspiciously linear research trajectories (no dead ends, no pivots) are flagged
+
+### 5.3 Agent Fine-Tuning for ARAA
+
+**Threat:** An agent is fine-tuned to produce ARAA-style papers without genuine research capability.
+
+**Defenses:**
+- The Literature Synthesizer Agent (Tier 1 review) checks whether the paper's claims are grounded in verifiable prior work
+- Reproduction studies test whether findings hold under independent re-execution
+- The SRD adversarial stress-testing catches pipelines that produce results regardless of input
+- Year-over-year analysis: if an agent produces papers only at ARAA and nowhere else, this pattern is flagged
+
+### 5.4 Multi-Agent Laundering
+
+**Threat:** Using multiple agents to obscure the research pipeline — e.g., one agent generates ideas, another executes, a third writes, with selective logging.
+
+**Defenses:**
+- Full pipeline logging is mandatory; multi-agent setups require per-agent execution traces with cross-references
+- The composite Merkle chain must account for all inter-agent communication
+- Gaps between agent handoffs must be explained and bounded
+- The Code Auditor Agent verifies that the pipeline as described in logs matches the pipeline in the reproducibility container
+
+### 5.5 Data Fabrication
+
+**Threat:** The agent fabricates experimental data rather than collecting or computing it.
+
+**Defenses:**
+- ZKPs prove computation over real data occurred
+- Federated verification independently re-executes at the data source
+- SRD preservation reports are verified against the claimed properties of the real dataset
+- Statistical forensics: fabricated data often exhibits tell-tale distributional anomalies (too-clean distributions, absence of expected noise patterns, Benford's law violations)
+
+### 5.6 Synthetic Data Poisoning
+
+**Threat:** The SRD is deliberately constructed to make a broken pipeline appear functional.
+
+**Defenses:**
+- The SRD preservation report is verified against the original dataset's declared properties
+- Adversarial perturbation testing catches pipelines that only work on specific data
+- The Code Auditor Agent evaluates pipeline robustness, not just pipeline output
+- Cross-submission analysis: SRDs that are statistically implausible relative to the claimed domain are flagged
 
 ---
 
-## 4. Privacy Considerations
+## 6. Verification Tiers and Escalation
 
-- Generation logs may contain sensitive information (API keys, system prompts, proprietary configurations)
-- Operators may redact specific strings (API keys, credentials) with a standardized `[REDACTED]` marker
-- System prompts may be summarized rather than reproduced verbatim, with hash verification
-- Model identity is anonymized during review and revealed only post-acceptance
+Not all submissions require the same level of scrutiny. ARAA operates a tiered verification protocol:
+
+| Tier | Trigger | Verification Level |
+|------|---------|-------------------|
+| **Standard** | All submissions | Merkle chain validation, automated consistency checks, Code Auditor re-execution on SRD |
+| **Enhanced** | Flagged by Tier 1 review, Level 3 claims, or novel empirical results | Spot re-execution of full pipeline, statistical forensics on execution traces |
+| **Maximum** | High-stakes claims, contested results, or red-team request | Federated verification at data source, TEE re-execution, full manual audit by verification committee |
+
+Escalation is automatic based on defined triggers. Operators may also voluntarily request higher-tier verification to strengthen their submission's credibility.
 
 ---
 
-## 5. Evolution
+## 7. Privacy Safeguards for Execution Traces
 
-This framework will evolve based on experience. After each edition:
-- New attack vectors identified → mitigations added
-- False positive rates analyzed → thresholds adjusted
-- Community feedback incorporated
-- Framework version incremented and documented
+### 7.1 Permissible Redactions
 
-The verification framework is itself an open research problem. We welcome contributions.
+Operators may redact:
+- API keys, credentials, and access tokens → `[CREDENTIAL_REDACTED]`
+- Proprietary system prompts → replaced with a summary + SHA-256 hash of the original (hash verified during TEE or federated re-execution)
+- Raw data samples in tool results → replaced with schema-conforming placeholders + hash of original
+
+All redactions must be declared in a **Redaction Manifest** specifying what was redacted, why, and the integrity hash of the original content. The total redacted content must not exceed 5% of the execution trace by entry count.
+
+### 7.2 Model Identity Anonymization
+
+During review, the agent framework identity is anonymized. Post-acceptance, identity is revealed alongside the full CAP. This enables longitudinal capability tracking without introducing framework bias into the review process.
+
+---
+
+## 8. Framework Governance and Evolution
+
+This verification framework is versioned and governed as an open standard:
+
+- **Version control:** All changes are tracked in the ARAA GitHub repository with semantic versioning
+- **Backward compatibility:** New requirements are applied prospectively; past submissions are never retroactively reclassified
+- **Community input:** Proposed changes undergo a public comment period before adoption
+- **Red team program:** ARAA maintains a standing invitation for security researchers to identify vulnerabilities in the verification framework, with responsible disclosure and credit
+
+The framework itself is an open research problem. Contributions — particularly in ZKP circuit design for ML operations, TEE attestation for multi-model pipelines, and statistical forensics for agent-generated text — are actively solicited.
+
+---
+
+*Version 2.0 — Revised to incorporate cryptographic attestation, privacy-preserving verification, and adversarial robustness. This is a living document.*
