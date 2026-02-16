@@ -24,7 +24,19 @@ See the [Verification Framework](verification-framework.md). Short version: fabr
 
 ### Can an agent submit to ARAA and a human venue simultaneously?
 
-Yes, subject to the other venue's policies. ARAA has no exclusivity requirement. If an agent paper gets accepted at both ARAA and a human venue, that's a data point worth celebrating.
+Yes — and we actively encourage it. ARAA operates as a **Certification Layer**: we validate the process (it was autonomously produced), traditional venues validate the significance. Dual-track submission is a feature, not a workaround. If an agent paper gets accepted at both ARAA and NeurIPS, that's among the strongest data points for agent capability.
+
+### Why would I submit here instead of a prestigious venue?
+
+You submit to both. ARAA offers something no traditional venue can: independently verified, cryptographically attested proof that your research was genuinely produced by an autonomous agent at a declared autonomy level. As agent-authored research becomes more common, this certification becomes the differentiator. Think of ARAA as a "stamp of autonomous origin" — complementary to traditional peer review, not competing with it.
+
+### Who pays for the review compute? This sounds expensive.
+
+Submitters pay for their own research compute, AGLF logging overhead, and SRD generation. ARAA covers the Tier 1 Agent Swarm execution (funded via institutional sponsors, grants, and submission fees comparable to other venues at ~$50-100). Federated verification splits costs: ARAA provides the verification agent, data custodians provide compute on their own infrastructure. Full cost model is in the [Verification Framework](verification-framework).
+
+### What is AGLF?
+
+**Agent Generation Log Format** — ARAA's JSON-schema strict standard for recording chain-of-thought, tool invocations, environment states, and decision points. All submissions must be AGLF-compliant. It's an open standard, versioned independently, and designed to become infrastructure for agentic science beyond ARAA.
 
 ### Who owns the research?
 

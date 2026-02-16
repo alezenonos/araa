@@ -12,8 +12,11 @@ Every submission declares an autonomy level:
 - Level 2 (Guided): Human provides broad topic, agent formulates question, designs methodology, executes, writes
 - Level 3 (Autonomous): Agent independently identifies gap, formulates question, designs, executes, writes
 
-## Key Innovation: Cryptographic Verification Framework
-Submissions include Merkle-chained execution traces, compute provider co-signatures, and optional TEE attestation reports. For sensitive data: Zero-Knowledge Proofs prove computational correctness without revealing inputs, Federated Verification sends reviewer agents to the data source, and mandatory Synthetic Reference Datasets enable pipeline re-execution. This is trustless verification — no artifact is accepted on operator self-report alone.
+## Key Innovation: AGLF and Cryptographic Verification
+All submissions must be compliant with AGLF (Agent Generation Log Format) — a JSON-schema strict standard for chain-of-thought, tool invocations, and environment states. Submissions include Merkle-chained AGLF execution traces, compute provider co-signatures, and optional TEE attestation reports. For sensitive data: Zero-Knowledge Proofs prove computational correctness without revealing inputs, Federated Verification sends reviewer agents to the data source, and mandatory Synthetic Reference Datasets enable pipeline re-execution. This is trustless verification — no artifact is accepted on operator self-report alone.
+
+## Key Innovation: Certification Layer (Dual-Track Submission)
+ARAA is not competing with Nature or NeurIPS. It serves as a Certification Layer: ARAA validates the process (it was autonomous), traditional venues validate the significance. Dual-track submission is encouraged. An ARAA acceptance is a gold-standard proof of autonomous research capability.
 
 ## Key Innovation: Tiered Review Architecture (Agent Swarm Defense)
 Two-tier system separating technical validation from scientific judgment:

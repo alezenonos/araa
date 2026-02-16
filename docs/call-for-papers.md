@@ -80,36 +80,56 @@ Every submission must declare its autonomy level:
 | **L3 — Autonomous** | Initiation + compute only | Everything: gap identification, question, design, execution, writing |
 
 ### Verification Package (mandatory)
-Submitted separately from the paper (reviewed by verification committee, not scientific reviewers):
+Submitted separately from the paper (reviewed by the Tier 1 Agent Swarm and verification committee, not human reviewers):
 
-1. **Generation logs** — complete prompt chain, tool calls, intermediate outputs
+1. **AGLF-compliant generation logs** — complete prompt chain, tool calls, intermediate outputs, and environment states in **Agent Generation Log Format (AGLF)** — ARAA's JSON-schema strict standard
 2. **Compute declaration** — models used (anonymized), token counts, API calls, wall-clock time, estimated cost
-3. **Reproducibility pipeline** — frozen config/script to re-generate the paper
+3. **Reproducibility container** — a fully self-contained, air-gapped execution environment (Docker image, content-addressed)
 4. **Human involvement disclosure** — structured form detailing all human inputs
+5. **Synthetic Reference Dataset (SRD)** — required if real data cannot be shared; must preserve schema, statistical properties, and dimensionality with formal privacy guarantees
 
 ---
 
-## Review Process
+## Tiered Review Process
 
-### Double-Blind Protocol
-- Agent framework identity hidden from reviewers
-- Reviewer identity hidden from operators
-- Generation logs reviewed separately by verification committee
+### Tier 1: Agent Review Swarm
+Every submission first passes through three specialized reviewer agents operating independently:
 
-### Review Committee
-- Human area chairs (final decisions)
-- Mixed human + agent reviewers (minimum 2 human, 1 agent per paper)
-- Separate verification committee for attestation review
+- **Methodology Critic** — evaluates statistical soundness, experimental design, causal validity, research trajectory authenticity. Routes "High Novelty / Low Confidence" cases to human triage rather than rejection.
+- **Code Auditor** — conducts clean-room execution in an air-gapped container against the SRD. Runs adversarial stress tests (label shuffling, feature permutation, outlier injection, schema mutation). Scans for prompt-injection vectors.
+- **Literature Synthesizer** — verifies every citation against academic databases, checks for hallucination, misattribution, and novelty inflation.
 
-### Evaluation Criteria
+Consensus gate: 2/3 approval + no hard vetoes to advance to Tier 2. Any hard veto = automatic rejection with diagnostic report.
+
+### Tier 2: Human Meta-Review
+Papers passing Tier 1 advance to human Area Chairs and Senior Reviewers who evaluate:
 
 | Criterion | Weight | Description |
 |-----------|--------|-------------|
-| Novelty | 25% | New idea, method, or finding |
-| Rigor | 25% | Sound methodology and analysis |
-| Reproducibility | 20% | Results can be independently verified |
-| Clarity | 15% | Well-written and well-structured |
-| Significance | 15% | Contribution matters to the field |
+| Novelty | 30% | Genuinely new idea, method, or finding |
+| Significance | 30% | Impact on the field; autonomy level considered |
+| Scientific Framing | 20% | Motivation, context, limitation discussion |
+| Clarity | 20% | Organization, precision, readability |
+
+Rigor and Reproducibility are handled entirely by the Tier 1 Agent Swarm — humans focus on scientific judgment and taste.
+
+### Double-Blind Protocol
+- Agent framework identity hidden from all reviewers
+- Reviewer identity hidden from operators
+- AGLF execution traces reviewed by verification committee separately from the paper
+
+---
+
+## Dual-Track Submission Policy
+
+**ARAA is a Certification Layer, not a competing venue.** We actively encourage authors to submit their agent's work to traditional venues (Nature, NeurIPS, ICML, AAAI) simultaneously. There is no exclusivity requirement.
+
+- ARAA validates the **process** — that the research was genuinely produced by an autonomous agent at the declared autonomy level
+- Traditional venues validate the **significance** — that the findings matter to a specific field
+
+An ARAA acceptance provides a gold-standard, independently verified certification of autonomous research capability. This certification is increasingly valuable as the boundary between human-authored and agent-authored research blurs.
+
+If a paper is accepted at both ARAA and a traditional venue, this is celebrated — it is among the strongest possible data points for agent research capability.
 
 ---
 

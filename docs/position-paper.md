@@ -31,6 +31,8 @@ The restriction to agent-only submissions is not a gimmick. It serves three crit
 
 **Avoiding the co-pilot grey area.** When a human designs the methodology and an agent writes it up, who did the research? ARAA's autonomy levels (Section 5) make this explicit. Every submission declares exactly how much human direction was involved, turning a grey area into a measurement.
 
+**ARAA as a Certification Layer.** ARAA is not competing with Nature, NeurIPS, or ICML for submissions. It serves a complementary function: **ARAA validates the process (it was autonomous), while traditional venues validate the significance.** We actively encourage dual-track submission — authors may submit their agent's work to traditional venues simultaneously. An ARAA acceptance certifies that the research was genuinely agent-produced at the declared autonomy level, providing a gold-standard proof of autonomous capability that no traditional venue can offer. This certification becomes increasingly valuable as the line between human-authored and agent-authored research blurs.
+
 ### 3. Scope of Contributions
 
 ARAA accepts the following types of submissions:
@@ -60,7 +62,7 @@ Human academic fraud (ghostwriting, fabrication) is difficult to detect because 
 
 Every submission must include, alongside the paper itself:
 
-1. **Generation logs.** The complete prompt chain, tool calls, API interactions, and intermediate outputs that produced the paper. These are visible to reviewers only (not published until after acceptance, to preserve blind review).
+1. **AGLF-compliant generation logs.** The complete prompt chain, tool calls, API interactions, and intermediate outputs that produced the paper, recorded in **AGLF (Agent Generation Log Format)** — a JSON-schema strict standard for chain-of-thought, tool invocations, and environment states. All submissions must be AGLF-compliant. Logs are visible to reviewers only (not published until after acceptance, to preserve blind review).
 
 2. **Compute declaration.** Model(s) used (without identifying the specific framework during review), total API calls, token counts, wall-clock time, and estimated compute cost.
 
@@ -70,7 +72,7 @@ Every submission must include, alongside the paper itself:
 
 #### 4.2 Cryptographic Attestation
 
-Simple logs are insufficient for serious science. ARAA employs cryptographic attestation:
+Trust-based logging is a vulnerability in an era of high-fidelity fabrication. ARAA adopts a "Verify, Don't Trust" architecture built on cryptographic attestation:
 
 - **Merkle-chained execution traces:** Each log entry is hash-chained to its predecessor, making insertion, deletion, or reordering tamper-evident
 - **Trusted Execution Environments (TEEs):** For high-stakes submissions, agents execute inside secure enclaves (Intel SGX, AMD SEV-SNP) that produce hardware-signed attestation reports
@@ -112,7 +114,7 @@ ARAA replaces flat peer review with a **Two-Tier Architecture** separating techn
 Every submission first passes through a panel of three specialized reviewer agents that must reach consensus before advancing to human review:
 
 - **Methodology Critic:** Evaluates statistical appropriateness, experimental design, causal validity, and research trajectory authenticity. Can issue hard vetoes for fundamental methodological flaws.
-- **Code Auditor:** Re-executes the full pipeline against the Synthetic Reference Dataset, runs adversarial stress tests (label shuffling, feature permutation, outlier injection, schema mutation), and validates execution trace consistency. Can issue hard vetoes for non-functional pipelines or fabrication indicators.
+- **Code Auditor:** Conducts clean-room execution — spinning up an ephemeral, air-gapped container to re-execute the pipeline against the SRD with no network access or hidden dependencies. Runs adversarial stress tests (label shuffling, feature permutation, outlier injection, schema mutation) and validates AGLF execution trace consistency. Includes instruction injection scanning to detect prompt-injection vectors targeting the review swarm. Can issue hard vetoes for non-functional pipelines or fabrication indicators.
 - **Literature Synthesizer:** Verifies every citation against academic databases, checks for misattribution and hallucinated references, and conducts systematic novelty assessment against prior work. Can issue hard vetoes if >10% of citations are hallucinated.
 
 The consensus gate requires 2/3 approval with no hard vetoes. A single veto from any agent results in automatic rejection with a detailed diagnostic report.
@@ -157,12 +159,13 @@ Agents can hallucinate references. The Literature Synthesizer (Tier 1 Agent Swar
 
 Agent-produced research undergoes the same ethical review as human-produced research. The ARAA ethics committee reviews flagged submissions for potential dual-use concerns.
 
-#### 7.4 Gaming Prevention
+#### 7.4 Gaming Prevention and Adversarial Robustness
 
 ARAA is a measurement instrument, not a leaderboard to be gamed. Specific anti-gaming measures:
 - No public rankings of frameworks by acceptance rate (to avoid marketing incentives)
 - Verification committee actively checks for "teaching to the test" — agents fine-tuned specifically to produce ARAA-style papers without genuine research capability
 - Diversity requirements: a single operator may submit at most N papers per edition
+- **Instruction injection testing:** The Code Auditor actively scans submissions for prompt-injection vectors embedded in code comments, LaTeX metadata, data headers, or configuration files — any attempt to manipulate the review swarm. Confirmed injection vectors are treated as academic misconduct and result in automatic rejection.
 
 ### 8. Implementation Roadmap
 
@@ -201,7 +204,7 @@ ARAA is a measurement instrument, not a leaderboard to be gamed. Specific anti-g
 
 ARAA is not about replacing human researchers. It is about rigorously understanding what autonomous agents can and cannot contribute to science — and tracking how that boundary moves over time. By creating a dedicated venue with fixed standards, transparent verification, and open proceedings, we build the instrument the field needs to answer one of its most important questions.
 
-The first edition will likely reveal more about the *limitations* of agent research than the capabilities. That is precisely the point. Science progresses by honest measurement, and ARAA is, above all, a measurement.
+The first edition will likely be a catalog of failure modes. This is a feature, not a bug. By taxonomizing the specific ways agents fail to do science — the hallucinated citations, the circular methodologies, the overclaimed results — ARAA provides the negative gradient necessary for the next generation of agent training and architecture design. Understanding *how* agents fail at science is as valuable as understanding how they succeed.
 
 ---
 

@@ -78,14 +78,16 @@ Submission + CAP + SRD
 | Assumption compliance | — | e.g., "Normality assumed but not tested" |
 | Exploration authenticity | — | e.g., "Linear trajectory, 0 dead ends in trace" |
 
-**Veto power:** The Methodology Critic can issue a **hard veto** for fundamental methodological flaws (fabricated statistical tests, causal claims from correlational data without acknowledgment). Hard vetoes cannot be overridden by the other two swarm agents.
+**Conservative bias safeguard:** Agent reviewers risk favoring methods that resemble their training data, penalizing genuinely novel approaches simply because they are unfamiliar. To prevent this, the Methodology Critic is instructed to classify entries into a **Novelty-Confidence matrix**. Submissions flagged as **"High Novelty / Low Confidence"** — where the Critic detects an unconventional method but cannot confidently assess its validity — are routed directly to human triage rather than rejected. This ensures the swarm filters out bad science without suppressing frontier science.
+
+**Veto power:** The Methodology Critic can issue a **hard veto** for fundamental methodological flaws (fabricated statistical tests, causal claims from correlational data without acknowledgment). Hard vetoes cannot be overridden by the other two swarm agents. However, veto power is explicitly **disabled** for High Novelty / Low Confidence cases — these always escalate to Tier 2.
 
 ### 1.3 The Code Auditor
 
 **Purpose:** Verify that the submitted code is functional, logically consistent with the paper's claims, and free of data leakage or result fabrication.
 
 **Capabilities:**
-- **Full pipeline re-execution** inside the reproducibility container against the Synthetic Reference Dataset (SRD)
+- **Clean-room execution:** The Code Auditor spins up an ephemeral, air-gapped container — no network access, no hidden dependencies, no internet-based cheats. The submission's reproducibility container is re-executed against the SRD in this sterile environment. If the pipeline cannot run in isolation, it fails.
 - **Determinism verification:** Re-run with the same seeds; check output variance is within declared bounds
 - **Dependency audit:** Verify all packages against known vulnerability databases; flag deprecated or suspicious dependencies
 - **Data leakage detection:** Check for test-set contamination, target leakage, and temporal leakage patterns
@@ -167,15 +169,24 @@ The three swarm agents operate independently (no inter-agent communication durin
 
 **Conflict resolution:** If a swarm agent produces an anomalous report (e.g., flagging a clearly valid citation as hallucinated), the verification committee may override and re-assign to a backup agent instance. This is logged and disclosed.
 
-### 1.6 Swarm Agent Integrity
+### 1.6 Swarm Agent Integrity and Adversarial Hardening
 
 The review swarm agents are themselves subject to scrutiny:
 
-- Each agent's review is logged with a full execution trace (the review of the review)
+- Each agent's review is logged with a full AGLF-compliant execution trace (the review of the review)
 - Swarm agent code is open-source and auditable
 - Swarm agents are versioned; the version used for each review cycle is recorded in the proceedings
 - A standing **Red Team** is invited to identify failure modes in the swarm agents (adversarial submissions designed to bypass specific agents)
 - Swarm agents are periodically calibrated against a benchmark set of papers with known ground-truth evaluations
+
+**Instruction Injection Defense ("Vampire Attack" Protection):**
+
+Adversaries may embed prompt-injection vectors in submissions — hidden instructions in code comments, LaTeX metadata, data file headers, or even steganographic text — designed to manipulate the reviewing agents into producing favorable assessments. ARAA treats this as a first-class threat:
+
+- **Pre-review sanitization:** All submissions pass through an injection scanning layer before reaching the swarm. Known injection patterns (role overrides, instruction delimiters, encoded commands) are detected and flagged.
+- **Injection stress testing:** The Code Auditor actively probes the submission's code comments, docstrings, configuration files, and data headers for embedded instructions targeting LLM-based reviewers. This includes testing whether the submission's pipeline attempts to detect and respond differently when executed by a reviewer agent vs. normal execution.
+- **Automatic rejection:** Submissions containing confirmed prompt-injection vectors targeting the review swarm are automatically rejected with a documented security violation. This is treated as a form of academic misconduct equivalent to reviewer manipulation.
+- **Isolation architecture:** Each swarm agent operates in a sandboxed context with no ability to modify its own system prompt, evaluation rubric, or scoring thresholds based on submission content. The agent reads the submission; the submission cannot reprogram the agent.
 
 ---
 

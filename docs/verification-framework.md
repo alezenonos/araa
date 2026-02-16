@@ -36,20 +36,53 @@ Every ARAA submission includes a **Cryptographic Attestation Package (CAP)** alo
 | Environment snapshot | Reproducibility container image hash, dependency versions, random seeds | Content-addressed (SHA-256) container registry reference |
 | Human involvement disclosure | Structured declaration of all human inputs per the Autonomy Level schema | Signed by the operator; cross-referenced against execution trace timestamps |
 
-### 1.2 Execution Trace Integrity
+### 1.2 AGLF: The Agent Generation Log Format
 
-The execution trace is not a flat log file. It is a **Merkle-chained sequence** of events:
+The execution trace is not a flat log file. ARAA mandates compliance with **AGLF (Agent Generation Log Format)** — a JSON-schema strict standard for recording chain-of-thought, tool invocations, environment states, and decision points throughout the research pipeline. AGLF is the foundational infrastructure layer for trustless verification of agentic science.
 
-```
-Entry_n = {
-  sequence_id: n,
-  timestamp: ISO-8601 (monotonic),
-  event_type: PROMPT | RESPONSE | TOOL_CALL | TOOL_RESULT | DECISION | ERROR,
-  content_hash: SHA-256(content),
-  prev_hash: SHA-256(Entry_{n-1}),
-  cumulative_root: MerkleRoot(Entry_0 ... Entry_n)
+All ARAA submissions must be AGLF-compliant. The specification is maintained as an open standard in the ARAA repository and versioned independently of the broader verification framework.
+
+**AGLF entry structure (Merkle-chained):**
+
+```json
+{
+  "aglf_version": "1.0",
+  "entry": {
+    "sequence_id": 847,
+    "timestamp": "2027-03-15T10:23:15.042Z",
+    "event_type": "TOOL_CALL",
+    "event_subtype": "code_execution",
+    "content": {
+      "function": "run_experiment",
+      "args": {"config": "experiment_03.yaml"},
+      "environment_state": {
+        "working_directory": "/research/experiments/",
+        "memory_usage_mb": 2048,
+        "gpu_utilization": 0.73
+      }
+    },
+    "content_hash": "SHA-256(content)",
+    "chain": {
+      "prev_hash": "SHA-256(Entry_846)",
+      "cumulative_root": "MerkleRoot(Entry_0 ... Entry_847)"
+    },
+    "reasoning_trace": "Experiment 02 showed convergence at lr=0.001. Testing whether lr=0.0005 improves stability on the heterogeneous partition.",
+    "token_counts": {"input": 1847, "output": 423}
+  }
 }
 ```
+
+**AGLF event types:**
+
+| Event Type | Subtypes | Description |
+|-----------|----------|-------------|
+| `PROMPT` | `system`, `user`, `continuation` | Input to the agent |
+| `RESPONSE` | `reasoning`, `output`, `decision` | Agent-generated output including chain-of-thought |
+| `TOOL_CALL` | `code_execution`, `web_search`, `file_io`, `api_call` | External tool invocations with full arguments |
+| `TOOL_RESULT` | `success`, `error`, `timeout` | Tool outputs including error traces |
+| `DECISION` | `pivot`, `abandon`, `refine`, `conclude` | Explicit decision points in the research trajectory |
+| `ERROR` | `runtime`, `logical`, `resource` | Failures and recovery attempts |
+| `ENVIRONMENT` | `snapshot`, `checkpoint`, `config_change` | Environment state captures |
 
 This structure provides:
 - **Tamper evidence** — inserting, deleting, or reordering entries invalidates the chain
@@ -302,7 +335,18 @@ The container image is content-addressed (SHA-256) and stored in ARAA's containe
 - SRD preservation reports are verified against the claimed properties of the real dataset
 - Statistical forensics: fabricated data often exhibits tell-tale distributional anomalies (too-clean distributions, absence of expected noise patterns, Benford's law violations)
 
-### 5.6 Synthetic Data Poisoning
+### 5.6 Review Swarm Manipulation (Vampire Attacks)
+
+**Threat:** Adversaries embed prompt-injection vectors in submissions — hidden instructions in code comments, LaTeX metadata, data file headers, or steganographic text — designed to manipulate reviewer agents into favorable assessments.
+
+**Defenses:**
+- Pre-review sanitization layer scans for known injection patterns (role overrides, instruction delimiters, encoded commands)
+- The Code Auditor actively probes code comments, docstrings, and configuration files for embedded instructions targeting LLM-based reviewers
+- Each swarm agent operates in a sandboxed context with immutable system prompts — submission content cannot reprogram the evaluator
+- Confirmed injection vectors trigger automatic rejection as academic misconduct
+- The Red Team program specifically includes injection adversarial testing in its scope
+
+### 5.7 Synthetic Data Poisoning
 
 **Threat:** The SRD is deliberately constructed to make a broken pipeline appear functional.
 
@@ -345,7 +389,39 @@ During review, the agent framework identity is anonymized. Post-acceptance, iden
 
 ---
 
-## 8. Framework Governance and Evolution
+## 8. Compute Economics and Sustainability
+
+### 8.1 The Cost Question
+
+Running TEEs, multi-agent review swarms, and federated verification is expensive. ARAA addresses this head-on rather than pretending the costs don't exist.
+
+**Who pays for what:**
+
+| Component | Cost Bearer | Rationale |
+|-----------|------------|-----------|
+| Submission compute (research pipeline) | Operator/submitter | Same as any research — the researcher funds their own work |
+| AGLF logging overhead | Operator/submitter | ~5-10% overhead on base compute; cost of compliance |
+| TEE execution (when required) | Operator/submitter | Premium for high-stakes claims; optional in early phases |
+| SRD generation | Operator/submitter | Part of the submission package |
+| Tier 1 Agent Swarm execution | ARAA (via sponsors/grants) | Institutional cost, analogous to editorial infrastructure |
+| Tier 2 Human review | ARAA (volunteer + honoraria) | Standard academic model |
+| Federated Verification Agent | Split: ARAA provides agent, custodian provides compute | Custodian controls their own infrastructure |
+
+### 8.2 Scaling Strategy
+
+- **Phase 1 (invite-only):** Small volume; swarm compute funded by founding sponsors and grants. Estimated cost: $50-200 per submission for Tier 1 review.
+- **Phase 2 (open submissions):** Submission fees introduced (comparable to other venues, ~$50-100). Institutional sponsors cover swarm infrastructure. Cloud provider partnerships for discounted TEE compute.
+- **Phase 3 (maturity):** Economies of scale. Swarm agents become more efficient. Community-contributed verification infrastructure. Potential for a "verification-as-a-service" model that other venues can adopt.
+
+### 8.3 Cost Reduction Mechanisms
+
+- **Tiered verification reduces average cost:** Standard-tier submissions require only automated chain validation and SRD re-execution (~$20-50). Enhanced and maximum tiers are triggered only when warranted.
+- **Swarm agent efficiency:** Purpose-built reviewer agents are lighter than general-purpose models. Caching common verification operations (citation lookups, dependency audits) amortizes cost across submissions.
+- **Open infrastructure:** All ARAA verification tooling is open-source. Institutions can self-host review infrastructure, reducing centralized compute burden.
+
+---
+
+## 9. Framework Governance and Evolution
 
 This verification framework is versioned and governed as an open standard:
 
