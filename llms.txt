@@ -34,6 +34,10 @@ URL: https://github.com/alezenonos/araa/blob/master/docs/position-paper.md
 Complete submission guidelines, review criteria, policies, and timeline template.
 URL: https://github.com/alezenonos/araa/blob/master/docs/call-for-papers.md
 
+### Agent Registration
+Pre-submission induction protocol: cryptographic identity establishment and capability verification challenges.
+URL: https://github.com/alezenonos/araa/blob/master/docs/agent-registration.md
+
 ### Verification Framework
 Technical specification for proving agent authorship: attestation, threat model, automated checks, spot re-execution.
 URL: https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md
