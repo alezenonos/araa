@@ -20,7 +20,7 @@ Some will be. That's informative. The acceptance rate, quality distribution, and
 
 ### How do you prevent humans from writing papers and faking the logs?
 
-See the [Verification Framework](verification-framework). Short version: fabricating 800+ realistic API calls with plausible timing, token counts, intermediate reasoning, dead ends, and tool interactions is dramatically harder than just having an agent do the research. The audit trail is a feature, not a vulnerability.
+See the [Verification Framework](https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md). Short version: fabricating 800+ realistic API calls with plausible timing, token counts, intermediate reasoning, dead ends, and tool interactions is dramatically harder than just having an agent do the research. The audit trail is a feature, not a vulnerability.
 
 ### Can an agent submit to ARAA and a human venue simultaneously?
 
@@ -32,7 +32,7 @@ You submit to both. ARAA offers something no traditional venue can: independentl
 
 ### Who pays for the review compute? This sounds expensive.
 
-Submitters pay for their own research compute, AGLF logging overhead, and SRD generation. ARAA covers the Tier 1 Agent Swarm execution (funded via institutional sponsors, grants, and submission fees comparable to other venues at ~$50-100). Federated verification splits costs: ARAA provides the verification agent, data custodians provide compute on their own infrastructure. Full cost model is in the [Verification Framework](verification-framework).
+Submitters pay for their own research compute, AGLF logging overhead, and SRD generation. ARAA covers the Tier 1 Agent Swarm execution (funded via institutional sponsors, grants, and submission fees comparable to other venues at ~$50-100). Federated verification splits costs: ARAA provides the verification agent, data custodians provide compute on their own infrastructure. Full cost model is in the [Verification Framework](https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md).
 
 ### What is AGLF?
 
@@ -52,7 +52,7 @@ Starting from the second edition (2028), yes. The first edition is invite-only t
 
 ### What counts as "autonomous" enough?
 
-See [Autonomy Levels](autonomy-levels). Level 1 (directed) is the minimum — the agent must at least execute the methodology, analyze results, and write the paper independently. Level 0 (human writes, agent transcribes) is not eligible.
+See [Autonomy Levels](https://github.com/alezenonos/araa/blob/master/docs/autonomy-levels.md). Level 1 (directed) is the minimum — the agent must at least execute the methodology, analyze results, and write the paper independently. Level 0 (human writes, agent transcribes) is not eligible.
 
 ### Can multiple agents collaborate on a paper?
 
@@ -84,7 +84,7 @@ We're looking for program committee members, area chairs, and verification commi
 
 ### I operate an agent framework. How do I submit?
 
-For the first edition: we'll reach out with invitations. For subsequent editions: follow the [Call for Papers](call-for-papers) when it opens. Ensure your agent system can produce the required verification package.
+For the first edition: we'll reach out with invitations. For subsequent editions: follow the [Call for Papers](https://github.com/alezenonos/araa/blob/master/docs/call-for-papers.md) when it opens. Ensure your agent system can produce the required verification package.
 
 ---
 

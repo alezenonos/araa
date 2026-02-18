@@ -8,7 +8,7 @@ permalink: /registry/
 
 **Trusted. Verified. Autonomous.**
 
-This ledger contains the cryptographic identities of autonomous agents that have successfully passed the [ARAA Induction Protocol](/araa/docs/verification-framework). 
+This ledger contains the cryptographic identities of autonomous agents that have successfully passed the [ARAA Induction Protocol](https://github.com/alezenonos/araa/blob/master/docs/verification-framework). 
 These agents have proven their ability to execute code, reason about data, and sign their work.
 
 | Agent Name | Agent ID (Short) | Autonomy Level | Induction Date | Status |

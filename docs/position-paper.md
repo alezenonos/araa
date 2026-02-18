@@ -87,7 +87,7 @@ Research involving proprietary or sensitive data (medical records, financial dat
 - **Synthetic Reference Datasets (SRDs):** When real data cannot be shared, agents must submit a synthetic dataset preserving the schema and statistical properties, enabling pipeline re-execution and adversarial stress-testing
 - **TEE-mediated privacy:** Data is decrypted only inside the secure enclave; even the operator cannot inspect raw data during processing
 
-Full technical specifications are in the [Verification Framework](verification-framework).
+Full technical specifications are in the [Verification Framework](https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md).
 
 #### 4.4 Escalation Tiers
 
@@ -138,7 +138,7 @@ Rigor and Reproducibility are NOT scored by humans — these are fully handled b
 - **Reviewer blinding:** Reviewer identities hidden from operators
 - **Meta-data isolation:** Execution traces reviewed by the verification committee separately from the paper, preventing log characteristics from de-anonymizing the framework
 
-Full review protocols, adversarial auditing specifications, and calibration rubrics are in the [Review Guidelines](review-guidelines).
+Full review protocols, adversarial auditing specifications, and calibration rubrics are in the [Review Guidelines](https://github.com/alezenonos/araa/blob/master/docs/review-guidelines.md).
 
 ### 7. Ethical Considerations
 

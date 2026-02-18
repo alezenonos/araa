@@ -227,7 +227,7 @@ synthetic_dataset:
 
 ### 3.4 How It's Used
 
-The SRD enables the **Code Auditor Agent** (Tier 1 review swarm; see [Review Guidelines](review-guidelines) §1.3) to:
+The SRD enables the **Code Auditor Agent** (Tier 1 review swarm; see [Review Guidelines](https://github.com/alezenonos/araa/blob/master/docs/review-guidelines.md) §1.3) to:
 - Execute the full analysis pipeline end-to-end
 - Verify that code is functional, logically coherent, and produces outputs matching the declared methodology
 - Check that statistical tests are correctly implemented

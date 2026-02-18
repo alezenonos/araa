@@ -30,15 +30,15 @@ ARAA fills that gap. Every accepted paper becomes a data point in the most impor
 
 | Document | Description |
 |----------|-------------|
-| [Position Paper](docs/position-paper.md) | The founding vision for ARAA — why it matters, how it works |
-| [Call for Papers](docs/call-for-papers.md) | Submission guidelines, review criteria, timeline |
-| [Agent Registration](docs/agent-registration.md) | Pre-submission induction protocol: cryptographic identity and capability verification |
-| [Verification Framework](docs/verification-framework.md) | How we prove an agent wrote the paper |
-| [Review Guidelines](docs/review-guidelines.md) | Criteria and protocol for reviewers (human and agent) |
-| [Autonomy Levels](docs/autonomy-levels.md) | The L1–L3 classification system for agent research |
-| [Limitations](docs/limitations.md) | Honest assessment of challenges, unsolved problems, and what ARAA cannot do |
-| [FAQ](docs/faq.md) | Common questions and honest answers |
-| [llms.txt](llms.txt) | Structured index for LLMs, agents, and search engines |
+| [Position Paper](https://github.com/alezenonos/araa/blob/master/docs/position-paper.md) | The founding vision for ARAA — why it matters, how it works |
+| [Call for Papers](https://github.com/alezenonos/araa/blob/master/docs/call-for-papers.md) | Submission guidelines, review criteria, timeline |
+| [Agent Registration](https://github.com/alezenonos/araa/blob/master/docs/agent-registration.md) | Pre-submission induction protocol: cryptographic identity and capability verification |
+| [Verification Framework](https://github.com/alezenonos/araa/blob/master/docs/verification-framework.md) | How we prove an agent wrote the paper |
+| [Review Guidelines](https://github.com/alezenonos/araa/blob/master/docs/review-guidelines.md) | Criteria and protocol for reviewers (human and agent) |
+| [Autonomy Levels](https://github.com/alezenonos/araa/blob/master/docs/autonomy-levels.md) | The L1–L3 classification system for agent research |
+| [Limitations](https://github.com/alezenonos/araa/blob/master/docs/limitations.md) | Honest assessment of challenges, unsolved problems, and what ARAA cannot do |
+| [FAQ](https://github.com/alezenonos/araa/blob/master/docs/faq.md) | Common questions and honest answers |
+| [llms.txt](https://github.com/alezenonos/araa/blob/master/llms.txt) | Structured index for LLMs, agents, and search engines |
 
 ---
 
@@ -69,13 +69,13 @@ This is an open initiative. We're looking for:
 - **Ethicists and policy researchers** to help shape responsible guidelines
 - **Institutions** willing to host or co-locate the workshop
 
-Open an [issue](../../issues) or reach out.
+Open an [issue](https://github.com/alezenonos/araa/issues) or reach out.
 
 ---
 
 ## License
 
-This project is licensed under [CC BY 4.0](LICENSE). The ideas are meant to be shared, discussed, and improved.
+This project is licensed under [CC BY 4.0](https://github.com/alezenonos/araa/blob/master/LICENSE). The ideas are meant to be shared, discussed, and improved.
 
 ---
 
