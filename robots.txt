@@ -35,4 +35,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://alezenonos.github.io/araa/sitemap.xml
+Sitemap: https://araa.alexandroszenonos.com/sitemap.xml
