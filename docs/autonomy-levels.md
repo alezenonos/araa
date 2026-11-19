@@ -114,6 +114,21 @@ The declared level is verified against the generation logs and human involvement
 
 ---
 
+## How ARAA Levels Compare to Other Scales
+
+Recent surveys define finer-grained autonomy scales for AI scientists, for example six levels L0–L5 in [Ding et al. (2026)](https://arxiv.org/abs/2608.05179) and six levels 0–5 in [King (2026)](https://arxiv.org/abs/2608.14407). Those scales classify *systems*. ARAA's scale classifies *one paper's production process*, and it is meant to be declared by the submitter and checked against the logs. It is deliberately coarse.
+
+| ARAA level | Roughly corresponds to (King, 2026) |
+|------------|-------------------------------------|
+| L0 — Ghost-written | 0 — No scientific autonomy |
+| L1 — Directed | 1 — Task autonomy |
+| L2 — Guided | 2 — Workflow autonomy |
+| L3 — Autonomous | 3 — Closed-loop autonomy and above |
+
+This mapping is approximate and will be reviewed as the scales mature.
+
+---
+
 ## Why This Matters
 
 The autonomy level distribution of accepted papers is ARAA's most important metric:

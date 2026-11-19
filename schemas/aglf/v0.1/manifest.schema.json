@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://araa.alexandroszenonos.com/schemas/aglf/v0.1/manifest.schema.json",
+  "title": "AGLF v0.1 manifest",
+  "description": "Seals an AGLF trace. The operator signs the canonical JSON of every manifest field except signature.value, so the trace commitments (file hash, record count, final record hash) and the declared autonomy level are all bound to the signature.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["aglf_version", "trace_file", "trace_file_sha256", "trace_id", "record_count", "final_record_hash", "declared_autonomy_level", "signature"],
+  "properties": {
+    "aglf_version": { "const": "0.1" },
+    "trace_file": { "type": "string" },
+    "trace_file_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "trace_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "record_count": { "type": "integer", "minimum": 1 },
+    "final_record_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "declared_autonomy_level": { "enum": ["L1", "L2", "L3"] },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "public_key", "value"],
+      "properties": {
+        "algorithm": { "const": "ed25519" },
+        "public_key": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Raw Ed25519 public key, hex." },
+        "value": { "type": "string", "pattern": "^[0-9a-f]{128}$", "description": "Ed25519 signature, hex, over the canonical JSON (keys sorted, no whitespace, UTF-8) of the whole manifest with signature.value removed." }
+      }
+    }
+  }
+}

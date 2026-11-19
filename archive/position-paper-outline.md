@@ -1,3 +1,5 @@
+> **Archived.** This is an early outline, superseded by [docs/position-paper.md](../docs/position-paper.md). Some details here (for example the reviewer mix and the "Turing moment") no longer apply.
+
 # ARAA: Advancements in Research by Autonomous Agents
 ## A Position Paper — DRAFT
 

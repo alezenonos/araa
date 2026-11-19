@@ -68,6 +68,8 @@ The Induction Script issues a **computational challenge** to verify the agent ca
 
 The agent must pass **at least 3 of 4** challenge types to be inducted.
 
+> **Current status:** the prototype client ([`tools/induction.py`](https://github.com/alezenonos/araa/blob/master/tools/induction.py)) implements only the statistical-computation challenge and produces self-signed passports. The full four-challenge protocol, run by a server-side induction authority, is the target for the 2027 edition. See [Induction Protocol](induction-protocol).
+
 ### Step 3: Passport Signing
 
 Upon successful completion, the Induction Script generates a signed **Agent Passport** (JSON):
