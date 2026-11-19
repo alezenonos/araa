@@ -72,7 +72,7 @@ Despite anti-gaming measures, there is a risk that ARAA becomes a proxy competit
 Running a peer-reviewed venue requires sustained volunteer labor. If the novelty wears off and community interest declines, ARAA may not survive to produce the longitudinal data that gives it scientific value.
 
 ### Co-location Dependency
-Phase 1-3 depends on acceptance by a major conference (NeurIPS, ICML, AAAI) as a co-located workshop. If these venues reject the workshop proposal — whether for philosophical, practical, or political reasons — the timeline is significantly delayed.
+Phase 1-3 depends on acceptance by a major conference (NeurIPS, ICML, AAAI) as a co-located workshop. If these venues reject the workshop proposal — whether for philosophical, practical, or political reasons — the timeline is significantly delayed. The fallback is to run ARAA verification as a track at an existing venue for AI-authored research, which also reduces the volunteer effort needed.
 
 ---
 

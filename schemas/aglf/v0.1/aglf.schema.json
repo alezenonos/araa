@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://araa.alexandroszenonos.com/schemas/aglf/v0.1/aglf.schema.json",
+  "title": "AGLF v0.1 record",
+  "description": "One line of an AGLF trace (JSON Lines). Each record is one finished OpenTelemetry span, using the OpenTelemetry GenAI semantic conventions for its attributes, plus ARAA fields and a hash chain.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["aglf_version", "seq", "trace_id", "span_id", "parent_span_id", "name", "start_time", "end_time", "status", "attributes", "araa", "prev_hash", "content_hash", "record_hash"],
+  "properties": {
+    "aglf_version": { "const": "0.1" },
+    "seq": { "type": "integer", "minimum": 0, "description": "Position in the trace, starting at 0, with no gaps." },
+    "trace_id": { "type": "string", "pattern": "^[0-9a-f]{32}$", "description": "OpenTelemetry trace ID. The same for every record in one trace." },
+    "span_id": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+    "parent_span_id": { "type": ["string", "null"], "pattern": "^[0-9a-f]{16}$" },
+    "name": { "type": "string", "minLength": 1, "description": "Span name, e.g. 'chat <model>', 'execute_tool <tool>', 'invoke_agent <agent>'." },
+    "start_time": { "type": "string", "format": "date-time" },
+    "end_time": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["ok", "error", "unset"] },
+    "attributes": {
+      "type": "object",
+      "description": "Span attributes. Use OpenTelemetry GenAI attribute names where one exists (gen_ai.*). Message content (gen_ai.input.messages, gen_ai.output.messages) is opt-in in OpenTelemetry but REQUIRED by ARAA for chat spans.",
+      "properties": {
+        "gen_ai.operation.name": { "type": "string", "examples": ["chat", "execute_tool", "invoke_agent", "invoke_workflow", "retrieval", "embeddings"] },
+        "gen_ai.provider.name": { "type": "string" },
+        "gen_ai.request.model": { "type": "string" },
+        "gen_ai.response.model": { "type": "string" },
+        "gen_ai.usage.input_tokens": { "type": "integer", "minimum": 0 },
+        "gen_ai.usage.output_tokens": { "type": "integer", "minimum": 0 },
+        "gen_ai.agent.id": { "type": "string" },
+        "gen_ai.agent.name": { "type": "string" },
+        "gen_ai.agent.version": { "type": "string" },
+        "gen_ai.conversation.id": { "type": "string" },
+        "gen_ai.tool.name": { "type": "string" },
+        "gen_ai.tool.call.id": { "type": "string" },
+        "gen_ai.input.messages": {},
+        "gen_ai.output.messages": {},
+        "error.type": { "type": "string" }
+      }
+    },
+    "araa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_type", "stage"],
+      "properties": {
+        "event_type": {
+          "enum": ["MODEL_CALL", "TOOL_CALL", "AGENT_STEP", "DECISION", "ENVIRONMENT", "HUMAN_INPUT"],
+          "description": "ARAA's view of the span. HUMAN_INPUT records any input from a person and is what the declared autonomy level is checked against."
+        },
+        "stage": { "enum": ["initiation", "gap_identification", "question", "design", "execution", "analysis", "writing", "other"] },
+        "decision": { "enum": ["pivot", "abandon", "refine", "conclude"], "description": "Required when event_type is DECISION." },
+        "human_role": { "type": "string", "description": "Required when event_type is HUMAN_INPUT. What the person provided, e.g. 'initiation', 'topic', 'question', 'methodology', 'edit'." },
+        "summary": { "type": "string", "maxLength": 2000, "description": "Short plain-text description of the step." },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": { "path": { "type": "string" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+          },
+          "description": "Files the step read or wrote, by content hash."
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "event_type": { "const": "DECISION" } } }, "then": { "required": ["decision"] } },
+        { "if": { "properties": { "event_type": { "const": "HUMAN_INPUT" } } }, "then": { "required": ["human_role"] } }
+      ]
+    },
+    "prev_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "record_hash of the previous record; 64 zeros for seq 0." },
+    "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the canonical JSON of this record without prev_hash, content_hash and record_hash." },
+    "record_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the ASCII string prev_hash + content_hash." }
+  }
+}

@@ -19,6 +19,20 @@ ARAA's verification framework is designed around three principles:
 
 This document specifies the technical architecture for achieving these principles at scale.
 
+### What is required in 2027, and what comes later
+
+Some parts of this framework can run today; others are open research problems for LLM-based pipelines. The first edition uses only the **minimum** column.
+
+| Component | Minimum (2027 edition) | Research agenda (later editions) |
+|-----------|------------------------|----------------------------------|
+| Generation log | [AGLF v0.1](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1): hash-chained OpenTelemetry GenAI spans, final hash signed by the operator | Merkle proofs for selective disclosure; logs signed as they are written |
+| Compute record | Operator-signed compute manifest, with the provider's usage export attached | Provider co-signatures (§1.4); TEE attestation reports (§1.3) |
+| Reproducibility | Clean-room re-execution in a network-isolated container (§5) | — |
+| Private data | Synthetic Reference Dataset (§3) | Federated verification (§2.3); TEE-mediated privacy (§2.4); zero-knowledge proofs (§2.2) |
+| Citations | Automated resolution of every reference | Citation-context checks |
+| Agent identity | Registration file + operator's GitHub identity (§4) | Server-side induction authority issuing signed passports |
+| Autonomy check | HUMAN_INPUT records in AGLF checked against the declared level | Statistical forensics for undisclosed human input |
+
 ---
 
 ## 1. Cryptographic Attestation of Compute
@@ -31,67 +45,58 @@ Every ARAA submission includes a **Cryptographic Attestation Package (CAP)** alo
 
 | Artifact | Description | Integrity Mechanism |
 |----------|-------------|-------------------|
-| Execution trace | Complete prompt chain, tool calls, intermediate outputs, decision points | Merkle tree over sequential log entries; root hash signed by execution environment |
-| Compute manifest | Model family (anonymized), token counts, API calls, wall-clock time, cost | Signed by the compute provider or TEE attestation report |
+| Execution trace | Complete prompt chain, tool calls, intermediate outputs, decision points | AGLF hash chain over sequential records; final hash signed by the operator (Ed25519). Merkle trees and signing by the execution environment: research agenda |
+| Compute manifest | Model family (anonymized), token counts, API calls, wall-clock time, cost | Signed by the operator, with the provider's usage export attached. Provider co-signature or TEE report: research agenda |
 | Environment snapshot | Reproducibility container image hash, dependency versions, random seeds | Content-addressed (SHA-256) container registry reference |
 | Human involvement disclosure | Structured declaration of all human inputs per the Autonomy Level schema | Signed by the operator; cross-referenced against execution trace timestamps |
 
 ### 1.2 AGLF: The Agent Generation Log Format
 
-The execution trace is not a flat log file. ARAA mandates compliance with **AGLF (Agent Generation Log Format)** — a JSON-schema strict standard for recording chain-of-thought, tool invocations, environment states, and decision points throughout the research pipeline. AGLF is the foundational infrastructure layer for trustless verification of agentic science.
+The execution trace is not a flat log file. ARAA requires **AGLF (Agent Generation Log Format)**, which records model calls, tool calls, decisions, environment states and every human input throughout the research pipeline.
 
-All ARAA submissions must be AGLF-compliant. The specification is maintained as an open standard in the ARAA repository and versioned independently of the broader verification framework.
+AGLF is a **profile of the OpenTelemetry GenAI semantic conventions**, not a new format. Each record is one finished OpenTelemetry span with standard `gen_ai.*` attributes. AGLF adds an `araa` block (research stage, event type, human role) and a hash chain. Building on OpenTelemetry means agent frameworks that already emit GenAI spans need little extra work to produce AGLF.
 
-**AGLF entry structure (Merkle-chained):**
+The specification is versioned on its own: **[AGLF v0.1](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1)** has a JSON Schema, a signed example trace, and a reference verifier ([`tools/aglf.py`](https://github.com/alezenonos/araa/blob/master/tools/aglf.py)).
+
+**An AGLF record (abridged):**
 
 ```json
 {
-  "aglf_version": "1.0",
-  "entry": {
-    "sequence_id": 847,
-    "timestamp": "2027-03-15T10:23:15.042Z",
+  "aglf_version": "0.1",
+  "seq": 3,
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "a000000000000004",
+  "parent_span_id": "a000000000000001",
+  "name": "execute_tool run_experiment",
+  "start_time": "2027-03-15T10:01:00.000Z",
+  "end_time": "2027-03-15T10:05:12.000Z",
+  "status": "ok",
+  "attributes": {
+    "gen_ai.operation.name": "execute_tool",
+    "gen_ai.tool.name": "run_experiment",
+    "gen_ai.tool.call.id": "call_03"
+  },
+  "araa": {
     "event_type": "TOOL_CALL",
-    "event_subtype": "code_execution",
-    "content": {
-      "function": "run_experiment",
-      "args": {"config": "experiment_03.yaml"},
-      "environment_state": {
-        "working_directory": "/research/experiments/",
-        "memory_usage_mb": 2048,
-        "gpu_utilization": 0.73
-      }
-    },
-    "content_hash": "SHA-256(content)",
-    "chain": {
-      "prev_hash": "SHA-256(Entry_846)",
-      "cumulative_root": "MerkleRoot(Entry_0 ... Entry_847)"
-    },
-    "reasoning_trace": "Experiment 02 showed convergence at lr=0.001. Testing whether lr=0.0005 improves stability on the heterogeneous partition.",
-    "token_counts": {"input": 1847, "output": 423}
-  }
+    "stage": "execution",
+    "summary": "Ran experiment_03 with lr=0.0005."
+  },
+  "prev_hash": "<record_hash of record 2>",
+  "content_hash": "<SHA-256 of this record without the three hash fields>",
+  "record_hash": "<SHA-256 of prev_hash + content_hash>"
 }
 ```
 
-**AGLF event types:**
-
-| Event Type | Subtypes | Description |
-|-----------|----------|-------------|
-| `PROMPT` | `system`, `user`, `continuation` | Input to the agent |
-| `RESPONSE` | `reasoning`, `output`, `decision` | Agent-generated output including chain-of-thought |
-| `TOOL_CALL` | `code_execution`, `web_search`, `file_io`, `api_call` | External tool invocations with full arguments |
-| `TOOL_RESULT` | `success`, `error`, `timeout` | Tool outputs including error traces |
-| `DECISION` | `pivot`, `abandon`, `refine`, `conclude` | Explicit decision points in the research trajectory |
-| `ERROR` | `runtime`, `logical`, `resource` | Failures and recovery attempts |
-| `ENVIRONMENT` | `snapshot`, `checkpoint`, `config_change` | Environment state captures |
+**ARAA event types** (`araa.event_type`): `MODEL_CALL`, `TOOL_CALL`, `AGENT_STEP`, `DECISION` (pivot, abandon, refine, conclude), `ENVIRONMENT` and `HUMAN_INPUT`. Errors use the span's `status` and `error.type`. A mapping from the earlier draft's event types is in the [AGLF README](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1).
 
 This structure provides:
-- **Tamper evidence** — inserting, deleting, or reordering entries invalidates the chain
-- **Selective disclosure** — operators can reveal specific entries for review without exposing the full trace, while proving their position in the chain
-- **Efficient auditing** — verification agents can validate chain integrity in O(n) and query specific subtrees in O(log n)
+- **Tamper evidence** — inserting, deleting, editing or reordering records breaks the chain, and the verifier reports where
+- **Autonomy checking** — every human input is a `HUMAN_INPUT` record, which is checked against the declared autonomy level
+- **Efficient auditing** — chain integrity is checked in one pass, O(n)
 
-Dead ends, failed approaches, and revisions are cryptographically committed. The trace records the *actual* research process, not a sanitized narrative.
+A hash chain shows that a trace has not changed since it was signed. It cannot show that the trace was honest when it was written, which is why ARAA also re-executes pipelines (§5) and applies statistical forensics (§6). Dead ends, failed approaches and revisions must be recorded: the trace records the *actual* research process, not a sanitized narrative.
 
-### 1.3 Trusted Execution Environments (TEEs)
+### 1.3 Trusted Execution Environments (TEEs) (research agenda)
 
 For high-stakes submissions — particularly those involving sensitive data or claiming breakthrough results — ARAA supports execution within **Trusted Execution Environments** (Intel SGX, AMD SEV-SNP, ARM CCA, or cloud-based Confidential Computing instances):
 
@@ -104,7 +109,7 @@ For high-stakes submissions — particularly those involving sensitive data or c
 
 The rationale: as ARAA matures and stakes increase, the cost of fabrication must scale proportionally. TEE attestation raises the bar from "difficult to fake logs" to "requires compromising hardware security."
 
-### 1.4 Compute Provider Co-Signatures
+### 1.4 Compute Provider Co-Signatures (research agenda)
 
 Where TEE execution is not feasible, ARAA accepts **compute provider co-signatures**: the API provider (e.g., the foundation model host) independently signs a statement confirming that a specific sequence of API calls occurred within a given time window, matching the declared token counts.
 
@@ -125,7 +130,7 @@ The original ARAA draft assumed data can always be shared for reproducibility. T
 
 A verification framework that cannot handle these cases excludes precisely the domains where agentic research is most promising (clinical science, financial modeling, population-level analytics). ARAA addresses this through three complementary mechanisms.
 
-### 2.2 Zero-Knowledge Proofs (ZKPs) for Computational Integrity
+### 2.2 Zero-Knowledge Proofs (ZKPs) for Computational Integrity (research agenda)
 
 For computations over sensitive data, the submitting agent can provide a **zero-knowledge proof** that a specific computation was correctly executed on a specific (hidden) input, producing a specific output — without revealing the input data.
 
@@ -150,7 +155,7 @@ Current ZKP systems (zkSNARKs, zkSTARKs, Plonk) impose significant computational
 - Decision tree / random forest inference
 - Standard preprocessing pipelines (normalization, imputation, encoding)
 
-### 2.3 Federated Verification
+### 2.3 Federated Verification (research agenda)
 
 When neither the data nor a zero-knowledge proof can leave the data source, ARAA supports **federated verification**: a Reviewer Agent travels to the data rather than the data traveling to the reviewer.
 
@@ -169,7 +174,7 @@ When neither the data nor a zero-knowledge proof can leave the data source, ARAA
 
 **Trust model:** The data custodian must trust the Verification Agent code (auditable) and the sandboxed environment (their own infrastructure). ARAA must trust that the custodian did not tamper with the data between the original execution and the verification run (mitigated by timestamp-binding in the original CAP).
 
-### 2.4 Trusted Execution Environments for Data Privacy
+### 2.4 Trusted Execution Environments for Data Privacy (research agenda)
 
 TEEs (Section 1.3) serve double duty: they attest compute integrity *and* protect data privacy. When research is conducted inside a TEE:
 
@@ -370,7 +375,7 @@ The container image is content-addressed (SHA-256) and stored in ARAA's containe
 - Pre-review sanitization layer scans for known injection patterns (role overrides, instruction delimiters, encoded commands)
 - The Code Auditor actively probes code comments, docstrings, and configuration files for embedded instructions targeting LLM-based reviewers
 - Each swarm agent operates in a sandboxed context with immutable system prompts — submission content cannot reprogram the evaluator
-- Confirmed injection vectors trigger automatic rejection as academic misconduct
+- Injection vectors confirmed by the verification committee lead to rejection as academic misconduct
 - The Red Team program specifically includes injection adversarial testing in its scope
 
 ### 6.7 Synthetic Data Poisoning
@@ -412,7 +417,7 @@ All redactions must be declared in a **Redaction Manifest** specifying what was 
 
 ### 8.2 Model Identity Anonymization
 
-During review, the agent framework identity is anonymized. Post-acceptance, identity is revealed alongside the full CAP. This enables longitudinal capability tracking without introducing framework bias into the review process.
+During review, the agent framework identity is anonymized. Registry entries, signatures and passports are checked only by the verification committee, and reviewers receive a pass/fail summary, never the identity. Post-acceptance, identity is revealed alongside the full CAP. This enables longitudinal capability tracking without introducing framework bias into the review process.
 
 ---
 

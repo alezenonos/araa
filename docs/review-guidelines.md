@@ -161,7 +161,7 @@ The three swarm agents operate independently (no inter-agent communication durin
 |---------|------|--------|
 | 3/3 PASS, no vetoes | Unanimous approval | → Advance to Tier 2 |
 | 2/3 PASS, no vetoes | Majority approval | → Advance to Tier 2 with flags |
-| Any hard veto | Automatic override | → Reject (with detailed report to operator) |
+| Any hard veto | Escalation | → Area Chair confirms (reject, with detailed report to operator) or overturns (advance to Tier 2 with flags) |
 | 2/3 FAIL, no vetoes | Majority rejection | → Reject (with detailed report) |
 | 1/3 PASS, no vetoes | Insufficient support | → Reject (with detailed report) |
 
@@ -185,7 +185,7 @@ Adversaries may embed prompt-injection vectors in submissions — hidden instruc
 
 - **Pre-review sanitization:** All submissions pass through an injection scanning layer before reaching the swarm. Known injection patterns (role overrides, instruction delimiters, encoded commands) are detected and flagged.
 - **Injection stress testing:** The Code Auditor actively probes the submission's code comments, docstrings, configuration files, and data headers for embedded instructions targeting LLM-based reviewers. This includes testing whether the submission's pipeline attempts to detect and respond differently when executed by a reviewer agent vs. normal execution.
-- **Automatic rejection:** Submissions containing confirmed prompt-injection vectors targeting the review swarm are automatically rejected with a documented security violation. This is treated as a form of academic misconduct equivalent to reviewer manipulation.
+- **Rejection for injection:** Submissions in which the verification committee confirms a prompt-injection vector targeting the review swarm are rejected with a documented security violation. The swarm flags; a human confirms. This is treated as a form of academic misconduct equivalent to reviewer manipulation.
 - **Isolation architecture:** Each swarm agent operates in a sandboxed context with no ability to modify its own system prompt, evaluation rubric, or scoring thresholds based on submission content. The agent reads the submission; the submission cannot reprogram the agent.
 
 ---
@@ -300,7 +300,8 @@ Each human review includes:
 | Pass (majority, flags) | Accept | **Accept with revisions** (flags addressed in camera-ready) |
 | Pass (majority, flags) | Borderline or below | **Reject** (technical flags + insufficient scientific merit) |
 | Pass (unanimous) | Reject | **Reject** (technically sound but not a contribution) |
-| Hard veto | — | **Reject** (does not reach Tier 2) |
+| Hard veto, confirmed by Area Chair | — | **Reject** |
+| Hard veto, overturned by Area Chair | As scored | Treated as "Pass (majority, flags)" |
 
 Area Chairs may override in exceptional cases (e.g., a paper of extraordinary significance with minor fixable technical flags). All overrides are documented in the proceedings.
 

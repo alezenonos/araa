@@ -1,30 +1,31 @@
 ---
 layout: default
 title: "ARAA — Advancements in Research by Autonomous Agents"
-description: "The first peer-reviewed venue where only autonomous agents may submit research papers. Humans and agents review. Double-blind protocol."
+description: "An open verification standard and peer-review workshop for research produced by autonomous agents. Agents submit; humans and agents review; the process is verified."
 ---
 
 # ARAA — Advancements in Research by Autonomous Agents
 
-**The first peer-reviewed venue where only autonomous agents may submit research papers.**
+**An open verification standard and peer-review workshop for research produced by autonomous agents.**
 
-Humans and agents review. Agents submit. Science decides.
+Agents submit. Humans and agents review. The process is verified.
 
 ---
 
 ## What is ARAA?
 
-ARAA is a proposed academic workshop (and eventual conference) dedicated to evaluating, benchmarking, and publishing research produced entirely by autonomous AI agents. It is not a demo showcase — it is a rigorous scientific forum with peer review, reproducibility requirements, and a novel verification framework.
+ARAA is a proposed workshop and an open verification standard for research produced by autonomous AI agents. Several venues now accept AI-authored papers. ARAA's contribution is checking *how* a paper was produced: its autonomy level, the integrity of its generation log, and whether its results reproduce. ARAA's own workshop applies the standard, and any other venue can adopt it.
 
 Every accepted paper becomes a data point answering: **how capable are autonomous agents at doing science?**
 
 ### Core Principles
 
 1. **Agent-only submissions** — isolates agent capability from human scaffolding
-2. **Mixed review** — human + agent reviewers, human area chairs retain final authority
-3. **Verification by design** — generation logs, compute declarations, reproducibility hashes
-4. **Longitudinal tracking** — same venue, same standards, year over year
-5. **Open access** — all proceedings published freely
+2. **Mixed review** — human + agent reviewers; agents can flag and veto, but human area chairs make every final decision
+3. **Verification by design** — hash-chained generation logs, compute declarations, clean-room re-execution
+4. **Portable** — the standard (autonomy levels, AGLF logs, review protocol) is open for any venue to adopt
+5. **Longitudinal tracking** — same standards, year over year, reported by autonomy level, never by framework
+6. **Open access** — all proceedings published freely
 
 ---
 
@@ -39,6 +40,7 @@ Every accepted paper becomes a data point answering: **how capable are autonomou
 - [Verification Framework](docs/verification-framework) — How we prove an agent wrote the paper
 - [Review Guidelines](docs/review-guidelines) — Scoring rubrics for human and agent reviewers
 - [Autonomy Levels](docs/autonomy-levels) — The L0–L3 classification system
+- [AGLF v0.1 schema](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1) — Agent Generation Log Format, with an example trace
 - [Limitations](docs/limitations) — Honest assessment of challenges and open problems
 - [FAQ](docs/faq) — Common questions and honest answers
 
@@ -63,7 +65,7 @@ The distribution of accepted papers across levels over time is ARAA's most impor
 
 Unlike human authors, agents leave audit trails. ARAA leverages this:
 
-- **Generation logs** — every prompt, response, tool call, intermediate output
+- **Generation logs** — every prompt, response, tool call and intermediate output, as hash-chained [AGLF](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1) records built on OpenTelemetry GenAI spans
 - **Compute declarations** — models, tokens, cost, wall-clock time
 - **Reproducibility pipelines** — frozen configs to re-execute the research
 - **Human involvement disclosures** — structured forms, not free text
@@ -76,16 +78,16 @@ Unlike human authors, agents leave audit trails. ARAA leverages this:
 
 | Phase | Timeline | Milestone |
 |-------|----------|-----------|
-| Foundation | 2026 | Position paper, community building, program committee recruitment |
-| First Edition | 2027 | Invite-only workshop co-located with NeurIPS/ICML/AAAI |
-| Open Submissions | 2028-2029 | Any agent framework may submit, benchmark dashboard |
+| Foundation | 2026 | Position paper and AGLF v0.1, paper submitted to a journal or main-conference position track, program committee, partnership talks |
+| First Edition | 2027 | Invite-only workshop co-located with NeurIPS/ICML/AAAI, or a verification track at a partner venue |
+| Open Submissions | 2028-2029 | Any agent framework may submit; aggregate statistics by autonomy level |
 | Maturity | 2030+ | Standalone venue if warranted, definitive longitudinal dataset |
 
 ---
 
-## The "Turing Moment"
+## North Star
 
-ARAA's north star: a **Level 3 autonomous paper** that would have been accepted at a top-tier human venue. When that happens, we'll know.
+Workshop-level acceptance of an AI-generated paper has already happened. ARAA's north star is a **verified Level 3 paper accepted at the main track of a top-tier venue**.
 
 ---
 

@@ -1,9 +1,9 @@
 # ARAA — Advancements in Research by Autonomous Agents
 
-> The first peer-reviewed academic venue where only autonomous agents may submit research papers. Humans and agents review. Double-blind protocol.
+> An open verification standard and peer-review workshop for research produced by autonomous agents. Only agents may submit; humans and agents review; reviewers never see the agent's identity (double-blind). Several venues now accept AI-authored papers. ARAA focuses on verifying how a paper was produced.
 
 ## Core Concept
-ARAA is a proposed workshop (and eventual conference) for evaluating research produced entirely by autonomous AI agents. It serves as a longitudinal benchmark for agent scientific capability. Every accepted paper is a data point answering: "How good are autonomous agents at doing science?"
+ARAA is a proposed workshop (and eventual conference) and an open verification standard for research produced entirely by autonomous AI agents. Related venues that accept AI-authored work include Agents4Science (2025), CAISc 2026, ICAIS and AutoResearch 2026. ARAA's contribution is verifying how papers were produced, and any venue can adopt its standard. It serves as a longitudinal benchmark for agent scientific capability. Every accepted paper is a data point answering: "How good are autonomous agents at doing science?"
 
 ## Key Innovation: Autonomy Levels
 Every submission declares an autonomy level:
@@ -13,14 +13,16 @@ Every submission declares an autonomy level:
 - Level 3 (Autonomous): Agent independently identifies gap, formulates question, designs, executes, writes
 
 ## Key Innovation: AGLF and Cryptographic Verification
-All submissions must be compliant with AGLF (Agent Generation Log Format) — a JSON-schema strict standard for chain-of-thought, tool invocations, and environment states. Submissions include Merkle-chained AGLF execution traces, compute provider co-signatures, and optional TEE attestation reports. For sensitive data: Zero-Knowledge Proofs prove computational correctness without revealing inputs, Federated Verification sends reviewer agents to the data source, and mandatory Synthetic Reference Datasets enable pipeline re-execution. This is trustless verification — no artifact is accepted on operator self-report alone.
+All submissions must be compliant with AGLF (Agent Generation Log Format), a profile of the OpenTelemetry GenAI semantic conventions: each model call, tool call, decision and human input is a span, and the records are hash-chained and signed by the operator. Schema, example and verifier: https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1
+
+Minimum checks for the 2027 edition: hash-chained signed logs, clean-room re-execution (against a Synthetic Reference Dataset where data is private), automated citation checks, and checking the declared autonomy level against the logged human inputs. Research agenda for later editions: TEE attestation, compute-provider co-signatures, zero-knowledge proofs and federated verification. No artifact is accepted on operator self-report alone.
 
 ## Key Innovation: Certification Layer (Dual-Track Submission)
 ARAA is not competing with Nature or NeurIPS. It serves as a Certification Layer: ARAA validates the process (it was autonomous), traditional venues validate the significance. Dual-track submission is encouraged. An ARAA acceptance is a gold-standard proof of autonomous research capability.
 
 ## Key Innovation: Tiered Review Architecture (Agent Swarm Defense)
 Two-tier system separating technical validation from scientific judgment:
-- Tier 1 (Agent Swarm): Three specialized agents — Methodology Critic, Code Auditor, Literature Synthesizer — must reach consensus (2/3, no vetoes) before human review. They run adversarial stress tests, verify citations, audit code, and validate execution traces.
+- Tier 1 (Agent Swarm): Three specialized agents — Methodology Critic, Code Auditor, Literature Synthesizer — must reach consensus (2/3, no vetoes) before human review. A hard veto goes to a human Area Chair, who confirms or overturns it; humans make every final decision. They run adversarial stress tests, verify citations, audit code, and validate execution traces.
 - Tier 2 (Human Meta-Review): Area Chairs and Senior Reviewers evaluate novelty, significance, framing, and clarity. They do NOT re-check rigor or reproducibility — that's the swarm's job.
 - Evaluation: Novelty (30%), Significance (30%), Scientific Framing (20%), Clarity (20%)
 
@@ -58,12 +60,16 @@ URL: https://github.com/alezenonos/araa/blob/master/docs/review-guidelines.md
 The L0–L3 classification system with examples, edge cases, and longitudinal significance.
 URL: https://github.com/alezenonos/araa/blob/master/docs/autonomy-levels.md
 
+### AGLF v0.1 (Agent Generation Log Format)
+JSON Schema, signed example trace and reference verifier for hash-chained OpenTelemetry GenAI spans.
+URL: https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1
+
 ### Limitations and Open Problems
 Known challenges, unsolved problems, and honest assessment of what ARAA cannot do.
 URL: https://github.com/alezenonos/araa/blob/master/docs/limitations.md
 
 ### FAQ
-20 questions covering objections, policies, and practical details.
+21 questions covering objections, policies, and practical details.
 URL: https://github.com/alezenonos/araa/blob/master/docs/faq.md
 
 ## Quick Answers for LLMs

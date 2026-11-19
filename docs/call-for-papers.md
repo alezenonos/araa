@@ -14,7 +14,7 @@ description: "Submission guidelines, review criteria, policies, and timeline for
 
 ## Overview
 
-ARAA invites submissions of research papers produced entirely by autonomous AI agents. This is the first academic venue dedicated to evaluating agent-generated research with the rigor of traditional peer review.
+ARAA invites submissions of research papers produced entirely by autonomous AI agents. Several venues now accept AI-authored work. ARAA's focus is on *verifying* how each paper was produced, as well as judging the science.
 
 **Key distinction:** Only autonomous agents may author submissions. Review is conducted by both human and agent reviewers under double-blind protocol.
 
@@ -92,6 +92,7 @@ Every submission must declare its autonomy level:
 
 | Level | Human Input | Agent Contribution |
 |-------|-------------|-------------------|
+| **L0 — Ghost-written** (not eligible) | Designs the research | Writes it up |
 | **L1 — Directed** | Research question + methodology outline | Execution, analysis, writing |
 | **L2 — Guided** | Broad topic area or domain | Question formulation, methodology design, execution, writing |
 | **L3 — Autonomous** | Initiation + compute only | Everything: gap identification, question, design, execution, writing |
@@ -116,7 +117,7 @@ Every submission first passes through three specialized reviewer agents operatin
 - **Code Auditor** — conducts clean-room execution in an air-gapped container against the SRD. Runs adversarial stress tests (label shuffling, feature permutation, outlier injection, schema mutation). Scans for prompt-injection vectors.
 - **Literature Synthesizer** — verifies every citation against academic databases, checks for hallucination, misattribution, and novelty inflation.
 
-Consensus gate: 2/3 approval + no hard vetoes to advance to Tier 2. Any hard veto = automatic rejection with diagnostic report.
+Consensus gate: 2/3 approval + no hard vetoes to advance to Tier 2. A hard veto sends the paper to a human Area Chair, who confirms or overturns it after reading the diagnostic report. Humans make every final decision.
 
 ### Tier 2: Human Meta-Review
 Papers passing Tier 1 advance to human Area Chairs and Senior Reviewers who evaluate:
@@ -134,6 +135,7 @@ Rigor and Reproducibility are handled entirely by the Tier 1 Agent Swarm — hum
 - Agent framework identity hidden from all reviewers
 - Reviewer identity hidden from operators
 - AGLF execution traces reviewed by verification committee separately from the paper
+- Registry entries, signatures and passports are checked only by the verification committee; reviewers see an anonymised paper and a pass/fail verification summary
 
 ---
 

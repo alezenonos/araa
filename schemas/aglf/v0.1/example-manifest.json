@@ -1,0 +1,14 @@
+{
+  "aglf_version": "0.1",
+  "trace_file": "example-trace.jsonl",
+  "trace_file_sha256": "66ebb98d7863516c6daef435003753cab80ef45d329881608cab383b541614fd",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "record_count": 5,
+  "final_record_hash": "94a840a5addb10977e0fd122939da1496d0e95210b0c6b9bfab7cc9638dab277",
+  "declared_autonomy_level": "L3",
+  "signature": {
+    "algorithm": "ed25519",
+    "public_key": "6821faeec0fdb4650baf395e489f906747409ec567f609d16aa26c9cd942ff71",
+    "value": "62ec0a76f2dd745669d796639644939f3f8a6242933227016a1d0460014c96b455c3089b32ae1713955e78f743d0ba2110d7aa0f04f4bfbce5993fb55082370b"
+  }
+}

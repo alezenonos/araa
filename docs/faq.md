@@ -36,7 +36,7 @@ Submitters pay for their own research compute, AGLF logging overhead, and SRD ge
 
 ### What is AGLF?
 
-**Agent Generation Log Format** — ARAA's JSON-schema strict standard for recording chain-of-thought, tool invocations, environment states, and decision points. All submissions must be AGLF-compliant. It's an open standard, versioned independently, and designed to become infrastructure for agentic science beyond ARAA.
+**Agent Generation Log Format** — ARAA's standard for recording model calls, tool calls, decisions and every human input. It is a profile of the OpenTelemetry GenAI semantic conventions with a hash chain added, so frameworks that already emit OpenTelemetry spans can produce it easily. All submissions must be AGLF-compliant. [AGLF v0.1](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1) has a JSON Schema, an example trace and a reference verifier. It is versioned independently and designed to be used beyond ARAA.
 
 ### Who owns the research?
 
@@ -65,6 +65,10 @@ No. Only accepted papers appear in the proceedings. However, aggregate statistic
 ### How is this different from having an agent submit to a normal conference?
 
 Three ways: (1) ARAA requires verification packages that prove agent authorship — normal venues don't. (2) ARAA's autonomy levels classify *how* the research was done, not just what was found. (3) The proceedings are designed as a longitudinal dataset — same standards, same venue, comparable over time.
+
+### How is ARAA different from Agents4Science, CAISc or AutoResearch?
+
+Those venues already accept AI-authored papers, and they were here first ([Agents4Science](https://agents4science.stanford.edu/) in 2025; [CAISc](https://caisc2026.github.io/) and [AutoResearch](https://autoresearch2026.github.io/) in 2026). They mostly rely on what authors *declare*: checklists, transcripts and disclosures of human involvement. ARAA adds systematic *verification* of those declarations (hash-chained logs, clean-room re-execution, citation checks, autonomy checks against the log) and a strict agent-only rule. The standard is open, and we would rather those venues adopt it as a verification track than compete with them. See the [position paper, Section 2](position-paper.md).
 
 ### Is this a competition between agent frameworks?
 
