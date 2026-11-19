@@ -10,8 +10,10 @@ Verifies an AGLF trace and its manifest, and can generate the example trace.
     1. every record matches schemas/aglf/v0.1/aglf.schema.json
     2. seq runs 0, 1, 2, ... with one trace_id throughout
     3. each content_hash, record_hash and prev_hash is correct (the hash chain)
-    4. the manifest matches the trace and its Ed25519 signature is valid
-    5. the HUMAN_INPUT records are allowed at the declared autonomy level
+    4. the manifest matches the trace, and its Ed25519 signature is valid over
+       the whole manifest (so the declared autonomy level is signed too)
+    5. model-call spans contain their prompt and response messages
+    6. the HUMAN_INPUT records are allowed at the declared autonomy level
 
 Canonical JSON (used for content_hash): keys sorted, no whitespace
 (separators "," and ":"), UTF-8, non-ASCII characters kept as-is.
@@ -43,6 +45,13 @@ def canonical(obj) -> bytes:
 
 def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def manifest_payload(manifest: dict) -> bytes:
+    """The bytes the operator signs: the whole manifest except signature.value."""
+    unsigned = dict(manifest)
+    unsigned["signature"] = {k: v for k, v in manifest.get("signature", {}).items() if k != "value"}
+    return canonical(unsigned)
 
 
 def content_hash(record: dict) -> str:
@@ -117,7 +126,7 @@ def verify(trace_path: str, manifest_path: str) -> list:
     try:
         sig = manifest["signature"]
         Ed25519PublicKey.from_public_bytes(bytes.fromhex(sig["public_key"])).verify(
-            bytes.fromhex(sig["value"]), manifest["final_record_hash"].encode("ascii")
+            bytes.fromhex(sig["value"]), manifest_payload(manifest)
         )
     except (InvalidSignature, KeyError, ValueError):
         problems.append("manifest: signature is invalid")
@@ -188,9 +197,9 @@ def example(out_dir: str):
         "trace_file_sha256": sha256_hex(trace_bytes), "trace_id": tid,
         "record_count": len(records), "final_record_hash": final,
         "declared_autonomy_level": "L3",
-        "signature": {"algorithm": "ed25519", "public_key": pub.hex(),
-                      "value": key.sign(final.encode("ascii")).hex()},
+        "signature": {"algorithm": "ed25519", "public_key": pub.hex()},
     }
+    manifest["signature"]["value"] = key.sign(manifest_payload(manifest)).hex()
     (out / "example-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"[+] Wrote example-trace.jsonl and example-manifest.json to {out}")
 

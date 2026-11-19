@@ -8,7 +8,7 @@
   "declared_autonomy_level": "L3",
   "signature": {
     "algorithm": "ed25519",
-    "public_key": "6821faeec0fdb4650baf395e489f906747409ec567f609d16aa26c9cd942ff71",
-    "value": "62ec0a76f2dd745669d796639644939f3f8a6242933227016a1d0460014c96b455c3089b32ae1713955e78f743d0ba2110d7aa0f04f4bfbce5993fb55082370b"
+    "public_key": "fdcdddfca5e3bf7df26f45b17ec50841767838d0d92e50074f8154a6af9097ea",
+    "value": "05008f2af7a8476475677e8f145513923374d9de7c312bcc5cabfb8f40b0a46cd571a64dab60071d5cd5dbae545bada9af62e3a3f7b61a6ca0cfacc2fbd40105"
   }
 }

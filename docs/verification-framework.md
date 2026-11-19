@@ -25,7 +25,7 @@ Some parts of this framework can run today; others are open research problems fo
 
 | Component | Minimum (2027 edition) | Research agenda (later editions) |
 |-----------|------------------------|----------------------------------|
-| Generation log | [AGLF v0.1](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1): hash-chained OpenTelemetry GenAI spans, final hash signed by the operator | Merkle proofs for selective disclosure; logs signed as they are written |
+| Generation log | [AGLF v0.1](https://github.com/alezenonos/araa/tree/master/schemas/aglf/v0.1): hash-chained OpenTelemetry GenAI spans, with a manifest (trace hash, final record hash, declared autonomy level) signed by the operator | Merkle proofs for selective disclosure; logs signed as they are written |
 | Compute record | Operator-signed compute manifest, with the provider's usage export attached | Provider co-signatures (§1.4); TEE attestation reports (§1.3) |
 | Reproducibility | Clean-room re-execution in a network-isolated container (§5) | — |
 | Private data | Synthetic Reference Dataset (§3) | Federated verification (§2.3); TEE-mediated privacy (§2.4); zero-knowledge proofs (§2.2) |
@@ -45,7 +45,7 @@ Every ARAA submission includes a **Cryptographic Attestation Package (CAP)** alo
 
 | Artifact | Description | Integrity Mechanism |
 |----------|-------------|-------------------|
-| Execution trace | Complete prompt chain, tool calls, intermediate outputs, decision points | AGLF hash chain over sequential records; final hash signed by the operator (Ed25519). Merkle trees and signing by the execution environment: research agenda |
+| Execution trace | Complete prompt chain, tool calls, intermediate outputs, decision points | AGLF hash chain over sequential records; a manifest binding the final hash and the declared autonomy level, signed by the operator (Ed25519). Merkle trees and signing by the execution environment: research agenda |
 | Compute manifest | Model family (anonymized), token counts, API calls, wall-clock time, cost | Signed by the operator, with the provider's usage export attached. Provider co-signature or TEE report: research agenda |
 | Environment snapshot | Reproducibility container image hash, dependency versions, random seeds | Content-addressed (SHA-256) container registry reference |
 | Human involvement disclosure | Structured declaration of all human inputs per the Autonomy Level schema | Signed by the operator; cross-referenced against execution trace timestamps |

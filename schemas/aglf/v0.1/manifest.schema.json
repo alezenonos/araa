@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://araa.alexandroszenonos.com/schemas/aglf/v0.1/manifest.schema.json",
   "title": "AGLF v0.1 manifest",
-  "description": "Seals an AGLF trace: the operator signs the last record_hash, so any change to any record is detectable.",
+  "description": "Seals an AGLF trace. The operator signs the canonical JSON of every manifest field except signature.value, so the trace commitments (file hash, record count, final record hash) and the declared autonomy level are all bound to the signature.",
   "type": "object",
   "additionalProperties": false,
   "required": ["aglf_version", "trace_file", "trace_file_sha256", "trace_id", "record_count", "final_record_hash", "declared_autonomy_level", "signature"],
@@ -21,7 +21,7 @@
       "properties": {
         "algorithm": { "const": "ed25519" },
         "public_key": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Raw Ed25519 public key, hex." },
-        "value": { "type": "string", "pattern": "^[0-9a-f]{128}$", "description": "Ed25519 signature over the ASCII final_record_hash, hex." }
+        "value": { "type": "string", "pattern": "^[0-9a-f]{128}$", "description": "Ed25519 signature, hex, over the canonical JSON (keys sorted, no whitespace, UTF-8) of the whole manifest with signature.value removed." }
       }
     }
   }

@@ -13,4 +13,5 @@ relative_links:
 exclude:
   - archive/
   - tools/
+  - tests/
   - "*.py"

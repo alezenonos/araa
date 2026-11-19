@@ -88,7 +88,7 @@ Logs that are simply trusted are easy to fake. ARAA follows a "verify, don't tru
 
 **Minimum version (2027 edition).** These checks can run with tools that exist today:
 
-- **Hash-chained, signed logs:** each AGLF record includes the hash of the one before it, so inserting, deleting or reordering records is detectable. The operator signs the final hash.
+- **Hash-chained, signed logs:** each AGLF record includes the hash of the one before it, so inserting, deleting or reordering records is detectable. The operator signs a manifest that binds the final hash to the declared autonomy level.
 - **Clean-room re-execution:** the pipeline is re-run in an isolated container with no network access, against a Synthetic Reference Dataset (Section 5.3) where real data cannot be shared.
 - **Automated citation checks:** every reference is resolved against bibliographic databases.
 - **Structured disclosure:** of human involvement and compute used.

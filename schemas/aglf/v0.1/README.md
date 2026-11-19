@@ -19,6 +19,7 @@ The OpenTelemetry GenAI conventions are still at *Development* status and now li
 | [`example-trace.jsonl`](example-trace.jsonl) | A 5-record example trace of an L3 run |
 | [`example-manifest.json`](example-manifest.json) | Its manifest, signed with a throwaway Ed25519 key |
 | [`../../../tools/aglf.py`](../../../tools/aglf.py) | Reference tool to verify a trace and to regenerate the example |
+| [`../../../tests/test_aglf.py`](../../../tests/test_aglf.py) | Tests: tampering, signature binding, autonomy checks, required message content |
 
 ## The hash chain
 
@@ -30,7 +31,7 @@ record_hash  = SHA-256( prev_hash + content_hash )     # the two hex strings joi
 prev_hash    = record_hash of the previous record      # 64 zeros for the first record
 ```
 
-Canonical JSON means: keys sorted, no whitespace (separators `,` and `:`), UTF-8. The operator signs the last `record_hash` with Ed25519. That signature goes in the manifest, together with the trace file's SHA-256 and the declared autonomy level.
+Canonical JSON means: keys sorted, no whitespace (separators `,` and `:`), UTF-8. The manifest records the trace file's SHA-256, the record count, the last `record_hash` and the declared autonomy level. The operator signs the canonical JSON of the whole manifest (everything except the signature value) with Ed25519, so changing any record *or* the declared level invalidates the signature.
 
 A hash chain shows that a trace has not been changed since it was signed. It does **not** show that the trace is complete or honest at the moment of recording: a dishonest operator could fabricate a whole trace and sign it. That is why ARAA also re-runs pipelines in a clean room and looks for statistical inconsistencies. Hardware attestation (TEEs) is on the research agenda (see the [Verification Framework](../../../docs/verification-framework.md)).
 
@@ -45,7 +46,7 @@ A hash chain shows that a trace has not been changed since it was signed. It doe
 | `ENVIRONMENT` | An `araa.environment` span; `araa.event_type = ENVIRONMENT` |
 | *(new)* | `araa.event_type = HUMAN_INPUT`, with `araa.human_role`. The verifier checks these against the declared autonomy level |
 
-Message content is opt-in in OpenTelemetry, but **ARAA requires it** for `chat` spans, because reviewers need to see the actual prompts and outputs.
+Message content is opt-in in OpenTelemetry, but **ARAA requires it** for model-call spans (`chat`, `text_completion`, `generate_content`), because reviewers need to see the actual prompts and outputs. The schema rejects such a span unless `gen_ai.input.messages` and `gen_ai.output.messages` are both non-empty lists of messages, each with a `role` and at least one part.
 
 ## Try it
 
@@ -54,6 +55,6 @@ pip install jsonschema cryptography
 python tools/aglf.py verify schemas/aglf/v0.1/example-trace.jsonl schemas/aglf/v0.1/example-manifest.json
 ```
 
-The verifier checks the schema, the order of records, the hash chain, the manifest and its signature, and whether each human input is allowed at the declared level. For example, at L3 a human may only start the run and copy-edit the text.
+The verifier checks the schema (including message content for model calls), the order of records, the hash chain, the manifest and its signature, and whether each human input is allowed at the declared level. For example, at L3 a human may only start the run and copy-edit the text.
 
 Comments are welcome: open an issue.
